@@ -1,0 +1,128 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat+Alternates:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Edu+NSW+ACT+Cursive:wght@400..700&display=swap');
+@import "tailwindcss";
+
+
+@theme {
+  /* Primary */
+  --color-primary: #4f46e5;
+  --color-primary-hover: #4338ca;
+  --color-primary-active: #3730a3;
+  --color-primary-muted: #e0e7ff;
+
+  /* Background */
+--color-background-items: #ef4444;     
+--color-background-itemsdark: #dc2626; 
+--color-background-input : #ffc3c37f;
+  --color-background: #f8fafc;
+  --color-background-secondary: #f1f5f9;
+  --bg-black: #000000;
+
+  /* Surface */
+  --color-surface: #ffffff;
+  --color-surface-hover: #f8fafc;
+  --color-surface-active: #f1f5f9;
+
+  /* Card */
+  --color-card: #ffffff;
+  --color-card-hover: #f8fafc;
+
+  /* Overlay */
+  --color-overlay: #000000;
+
+  /* Text */
+  --color-text: #09090b;
+  --color-text-secondary: #3f3f46;
+  --color-text-muted: #71717a;
+  --color-text-subtle: #a1a1aa;
+  --color-text-disabled: #d4d4d8;
+  --color-text-dark: #242424;
+  --color-text-inverse: #ffffff;
+
+  /* Border */
+  --color-border: #e4e4e7;
+  --color-border-hover: #d4d4d8;
+  --color-border-active: #a1a1aa;
+
+  /* Divider */
+  --color-divider: #e4e4e7;
+
+  /* Input */
+  --color-input: #ffffff;
+  --color-input-hover: #f8fafc;
+  --color-input-focus: #eef2ff;
+
+  /* Placeholder */
+  --color-input-placeholder: #a1a1aa;
+
+  /* Success */
+  --color-success: #16a34a;
+  --color-success-hover: #15803d;
+  --color-success-muted: #dcfce7;
+  --color-success-text: #166534;
+
+  /* Warning */
+  --color-warning: #d97706;
+  --color-warning-hover: #b45309;
+  --color-warning-muted: #fef3c7;
+  --color-warning-text: #92400e;
+
+  /* Danger */
+  --color-danger: #dc2626;
+  --color-danger-hover: #b91c1c;
+  --color-danger-muted: #fee2e2;
+  --color-danger-text: #991b1b;
+
+  /* Info */
+  --color-info: #2563eb;
+  --color-info-hover: #1d4ed8;
+  --color-info-muted: #dbeafe;
+  --color-info-text: #1e40af;
+
+  /* Focus */
+  --color-focus: #4f46e5;
+}
+.testing{
+  background-color: #ffc3c37f;
+}
+body,html{
+      width: 100%;
+      height: 100%;
+      overflow-x: hidden;
+}
+.alterative{
+      font-family: "Montserrat Alternates", sans-serif;
+}
+.alterativeSec{
+      font-family: "Manrope", sans-serif;
+}
+.glass{
+  background-color: #00000024;
+  backdrop-filter: blur(10px);
+}
+.cursiveFont{
+    font-family: "Edu NSW ACT Cursive", cursive;
+}
+@keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-10px); }
+        }
+        @keyframes floatSlow {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-6px); }
+        }
+        @keyframes drift {
+          0%, 100% { transform: translate(0, 0); }
+          50% { transform: translate(14px, -18px); }
+        }
+        @keyframes shine {
+          0% { transform: translateX(-120%) rotate(8deg); }
+          100% { transform: translateX(220%) rotate(8deg); }
+        }
+        .card-main { animation: float 6s ease-in-out infinite; }
+        .card-a { animation: floatSlow 5s ease-in-out infinite; animation-delay: 0.3s; }
+        .card-b { animation: floatSlow 5.5s ease-in-out infinite; animation-delay: 0.6s; }
+        .blob-1 { animation: drift 9s ease-in-out infinite; }
+        .blob-2 { animation: drift 11s ease-in-out infinite reverse; }
+        .shine-sweep { animation: shine 3.2s ease-in-out infinite; animation-delay: 1s; }
