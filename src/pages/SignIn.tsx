@@ -3,19 +3,21 @@ import { Logo } from '../assets';
 import { useForm } from 'react-hook-form';
 import type { Inputs } from '../types/formTypes';
 import {
-  FiUser,
   FiMail,
   FiLock,
   FiEye,
   FiEyeOff,
   FiArrowRight,
-  FiCheckCircle,
   FiAlertCircle,
 } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import ShowCase from '../components/ShowCase';
 import ForgotPassword from '../components/ForgotPassword';
+import { useDispatch, useSelector } from 'react-redux';
+import type { AppDispatch, RootState } from '../store/store';
+import { userLogin } from '../store/actions/auth.actions';
+import { toast } from 'react-toastify';
 
 const SignIn = () => {
   const {
@@ -26,10 +28,22 @@ const SignIn = () => {
 
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [isFocused, setIsFocused] = useState<string | null>(null);
-  const [showResetModel,setShowResetModel] = useState<boolean>(false);
-
+  const [showResetModel, setShowResetModel] = useState<boolean>(false);
+  const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
   const onSubmit = async (data: Inputs) => {
-    console.log(data);
+    try {
+      const response = await dispatch(userLogin(data));
+      if (response?.success) {
+        toast.success(response?.message || "Successfully logged In");
+        navigate("/",{ replace : true });
+      } else {
+        toast.error(response?.message || "Unexpected error occured");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Unexpected error occured")
+    }
   };
 
   const handleGoogleSignup = () => {
@@ -99,13 +113,12 @@ const SignIn = () => {
               <div>
                 <div className="relative">
                   <div
-                    className={`absolute left-3 top-1/2 -translate-y-1/2 transition-colors duration-300 ${
-                      errors.email
+                    className={`absolute left-3 top-1/2 -translate-y-1/2 transition-colors duration-300 ${errors.email
                         ? 'text-danger'
                         : isFocused === 'email'
                           ? 'text-background-items'
                           : 'text-text-muted'
-                    }`}
+                      }`}
                   >
                     <FiMail className="w-5 h-5" />
                   </div>
@@ -134,13 +147,12 @@ const SignIn = () => {
               <div>
                 <div className="relative">
                   <div
-                    className={`absolute left-3 top-1/2 -translate-y-1/2 transition-colors duration-300 ${
-                      errors.password
+                    className={`absolute left-3 top-1/2 -translate-y-1/2 transition-colors duration-300 ${errors.password
                         ? 'text-danger'
                         : isFocused === 'password'
                           ? 'text-background-items'
                           : 'text-text-muted'
-                    }`}
+                      }`}
                   >
                     <FiLock className="w-5 h-5" />
                   </div>
@@ -165,7 +177,7 @@ const SignIn = () => {
                   </button>
                 </div>
                 <div className="pt-2">
-                    <p className='text-sm text-text-secondary'>Forgot Password ? <span className='text-background-itemsdark font-[500] cursor-pointer' onClick={() => setShowResetModel(true)}>click here to reset</span></p>
+                  <p className='text-sm text-text-secondary'>Forgot Password ? <span className='text-background-itemsdark font-[500] cursor-pointer' onClick={() => setShowResetModel(true)}>click here to reset</span></p>
                 </div>
                 {errors.password && (
                   <p className="mt-1.5 text-xs text-danger flex items-center gap-1">
@@ -179,24 +191,24 @@ const SignIn = () => {
                 className="relative group w-full bg-background-items hover:bg-background-itemsdark disabled:opacity-60 disabled:cursor-not-allowed text-text-inverse font-semibold py-3.5 rounded-xl transition-all duration-300 overflow-hidden shadow-lg shadow-background-items/20 mt-1"
               >
                 <span className="relative z-10 flex items-center justify-center gap-2">
-                  {isSubmitting ? 'Creating account…' : 'Create account'}
+                  {isSubmitting ? 'Login...' : 'Login account'}
                   {!isSubmitting && (
                     <FiArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
                   )}
                 </span>
               </button>
               <Link to={'/signup'}>
-              <p className="text-center text-text-muted text-sm">
-                Don't have an account?{' '}
-                <span  className="text-background-items hover:text-background-itemsdark font-semibold transition-colors duration-300">
-                  Sign Up
-                </span>
-              </p>
-              </Link>        
+                <p className="text-center text-text-muted text-sm">
+                  Don't have an account?{' '}
+                  <span className="text-background-items hover:text-background-itemsdark font-semibold transition-colors duration-300">
+                    Sign Up
+                  </span>
+                </p>
+              </Link>
             </form>
           </div>
         </div>
-         <ShowCase />         
+        <ShowCase />
       </div>
       {showResetModel && <ForgotPassword setEmailShow={setShowResetModel} />}
     </div>

@@ -16,7 +16,10 @@ import { FcGoogle } from 'react-icons/fc';
 import { Link } from 'react-router-dom';
 import ShowCase from '../components/ShowCase';
 import EmailSend from '../components/EmailSend';
-
+import { registeration } from '../store/actions/auth.actions';
+import { useDispatch } from 'react-redux';
+import type { AppDispatch } from '../store/store';
+import { toast } from 'react-toastify';
 const Signup = () => {
   const {
     register,
@@ -28,11 +31,23 @@ const Signup = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
   const [isFocused, setIsFocused] = useState<string | null>(null);
-  const [showEmailVerficationModel,setEmailVerficationModel] = useState<boolean>(false);
+  const [showEmailVerficationModel, setEmailVerficationModel] = useState<boolean>(false);
   const password = watch('password');
-
+  const dispatch = useDispatch<AppDispatch>();
   const onSubmit = async (data: Inputs) => {
-    console.log(data);
+    const { confirmPassword, ...registerData } = data;
+    try {
+      const res = await dispatch(registeration(registerData));
+      if (res?.success) {
+        setEmailVerficationModel(true);
+        toast.success(res?.message || "Email sended to your email address verify!");
+      } else {
+        toast.error(res?.message || "Error occured");
+      }
+    } catch (error) {
+      console.error("Registration error:", error);
+      toast.error("An unexpected error occured");
+    }
   };
 
   const handleGoogleSignup = () => {
@@ -102,13 +117,12 @@ const Signup = () => {
               <div>
                 <div className="relative">
                   <div
-                    className={`absolute left-3 top-1/2 -translate-y-1/2 transition-colors duration-300 ${
-                      errors.username
+                    className={`absolute left-3 top-1/2 -translate-y-1/2 transition-colors duration-300 ${errors.username
                         ? 'text-danger'
                         : isFocused === 'username'
                           ? 'text-background-items'
                           : 'text-text-muted'
-                    }`}
+                      }`}
                   >
                     <FiUser className="w-5 h-5" />
                   </div>
@@ -137,13 +151,12 @@ const Signup = () => {
               <div>
                 <div className="relative">
                   <div
-                    className={`absolute left-3 top-1/2 -translate-y-1/2 transition-colors duration-300 ${
-                      errors.email
+                    className={`absolute left-3 top-1/2 -translate-y-1/2 transition-colors duration-300 ${errors.email
                         ? 'text-danger'
                         : isFocused === 'email'
                           ? 'text-background-items'
                           : 'text-text-muted'
-                    }`}
+                      }`}
                   >
                     <FiMail className="w-5 h-5" />
                   </div>
@@ -172,13 +185,12 @@ const Signup = () => {
               <div>
                 <div className="relative">
                   <div
-                    className={`absolute left-3 top-1/2 -translate-y-1/2 transition-colors duration-300 ${
-                      errors.password
+                    className={`absolute left-3 top-1/2 -translate-y-1/2 transition-colors duration-300 ${errors.password
                         ? 'text-danger'
                         : isFocused === 'password'
                           ? 'text-background-items'
                           : 'text-text-muted'
-                    }`}
+                      }`}
                   >
                     <FiLock className="w-5 h-5" />
                   </div>
@@ -212,13 +224,12 @@ const Signup = () => {
               <div>
                 <div className="relative">
                   <div
-                    className={`absolute left-3 top-1/2 -translate-y-1/2 transition-colors duration-300 ${
-                      errors.confirmPassword
+                    className={`absolute left-3 top-1/2 -translate-y-1/2 transition-colors duration-300 ${errors.confirmPassword
                         ? 'text-danger'
                         : isFocused === 'confirm'
                           ? 'text-background-items'
                           : 'text-text-muted'
-                    }`}
+                      }`}
                   >
                     <FiLock className="w-5 h-5" />
                   </div>
@@ -262,17 +273,17 @@ const Signup = () => {
                 </span>
               </button>
               <Link to={'/signIn'}>
-              <p className="text-center text-text-muted text-sm">
-                Already have an account?{' '}
-                <span  className="text-background-items hover:text-background-itemsdark font-semibold transition-colors duration-300">
-                  Sign in
-                </span>
-              </p>
-              </Link>        
+                <p className="text-center text-text-muted text-sm">
+                  Already have an account?{' '}
+                  <span className="text-background-items hover:text-background-itemsdark font-semibold transition-colors duration-300">
+                    Sign in
+                  </span>
+                </p>
+              </Link>
             </form>
           </div>
         </div>
-         <ShowCase />         
+        <ShowCase />
       </div>
       {showEmailVerficationModel && <EmailSend setEmailShow={setEmailVerficationModel} />}
     </div>

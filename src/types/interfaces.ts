@@ -14,6 +14,7 @@ export interface User {
     avatar : string;
     organization : OrganizationMembership[];
     preferences : UserPreferences;
+    isEmailVerified : boolean;
 }
 export interface AuthState{
     user : User | null;

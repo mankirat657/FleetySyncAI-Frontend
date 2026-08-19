@@ -3,6 +3,10 @@ import type { EmailSendProps } from "../types/interfaces"
 import { HiOutlineEnvelopeOpen } from "react-icons/hi2"
 import { IoClose } from "react-icons/io5"
 const EmailSend = ({ setEmailShow } : EmailSendProps) => {
+
+  const resendEmail = async() =>{ 
+    
+  }
   return (
     <div className="inset-0 bg-black/20 fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2  flex min-h-screen w-full items-center justify-center px-4 py-10">
       
@@ -25,6 +29,7 @@ const EmailSend = ({ setEmailShow } : EmailSendProps) => {
           This page will update automatically once you click the link
         </div>
         <button
+          onClick={resendEmail}
           type="button"
           className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-background-items px-4 py-3 text-sm font-medium text-text-inverse transition-colors hover:bg-background-itemsdark active:bg-background-itemsdark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
         >
