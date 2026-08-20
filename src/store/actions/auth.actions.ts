@@ -1,7 +1,7 @@
 import type { AppDispatch } from "../store";
 import { setLoading, loginSuccess, setError, registerSuccess, getMeSuccess, logoutState, clearError } from "../features/user/userSlice";
 import type { loginData, RegisterData } from "../../types/interfaces";
-import { getMeApi, loginApi, logoutApi, registerApi, setAccessTokenApi, verifyEmailApi } from "../service/AuthService";
+import { forgotPasswordApi, getMeApi, loginApi, logoutApi, registerApi, resendEmailApi, resetPasswordApi, setAccessTokenApi, verifyEmailApi } from "../service/AuthService";
 
 export const registeration = (data: RegisterData) => async (dispatch: AppDispatch) => {
     try {
@@ -127,5 +127,54 @@ export const userLogout = () => async(dispatch : AppDispatch) => {
         }
     } finally{
         dispatch(setLoading(false));
+    }
+}
+
+export const forgotPassword = ( email : string ) => async(dispatch  : AppDispatch) => {
+    try {
+        dispatch(setLoading(true));
+
+        const response = await forgotPasswordApi(email);
+        if(response.data.success){
+            return response.data;
+        }
+        dispatch(setError(response.data.message || "Unexpected error occured"));
+    } catch (error : any) {
+         const message = error.response?.data?.message || "Unexpected error occured";
+         dispatch(setError(message));
+         return {
+            success: false,
+            message
+        }
+    } finally{
+        dispatch(setLoading(false));
+    }
+}
+export const resetPassword = ( token : string, password : string ) => async( dispatch : AppDispatch ) => {
+    try {
+        dispatch(setLoading(true));
+        const response = await resetPasswordApi(token,password);
+
+        if(response.data.success){
+            return response.data;
+        }
+        dispatch(setError(response.data.message || "Unexpected error occured"));
+    } catch (error : any) {
+        const message = error.response?.data?.message || "Unexpected error occured";
+         dispatch(setError(message));
+         return {
+            success: false,
+            message
+        }
+    } finally{
+        dispatch(setLoading(false));
+    }
+}
+export const resendVerificationEmail = ( email : string ) => async( dispatch : AppDispatch ) => {
+    try {
+        dispatch(setLoading(true))
+        const response = await resendEmailApi(email);
+    } catch (error) {
+        
     }
 }

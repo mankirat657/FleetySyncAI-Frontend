@@ -2,7 +2,11 @@ import { FiMail, FiRefreshCw } from "react-icons/fi"
 import type { EmailSendProps } from "../types/interfaces"
 import { HiOutlineEnvelopeOpen } from "react-icons/hi2"
 import { IoClose } from "react-icons/io5"
+import { useDispatch } from "react-redux"
+import type { AppDispatch } from "../store/store"
 const EmailSend = ({ setEmailShow } : EmailSendProps) => {
+
+  const dispatch = useDispatch<AppDispatch>()
 
   const resendEmail = async() =>{ 
     

@@ -3,46 +3,64 @@
 import { useState } from 'react'
 import { HiOutlineLockClosed } from 'react-icons/hi2'
 import { FiEye, FiEyeOff, FiCheck } from 'react-icons/fi'
+import { useNavigate, useParams } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
+import type { AppDispatch, RootState } from '../store/store'
+import { resetPassword } from '../store/actions/auth.actions'
+import { toast } from 'react-toastify'
 
 const ResetPassword = () => {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
-
+  const dispatch = useDispatch<AppDispatch>()
+  const { token } = useParams<{ token : string}>();
+  const navigate = useNavigate();
   const passwordsMatch =
     confirmPassword.length > 0 && password === confirmPassword
   const hasMinLength = password.length >= 8
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const { loading } = useSelector((state : RootState) => state.auth);
+  const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault()
-    // handle reset logic here
+    if(!token) {
+      toast.error("Invalid or token missing");
+      return;
+    };
+    try {
+      const response = await dispatch(resetPassword(token,password));
+      
+      if(response?.success){
+        toast.success(response?.message || "Password reset successfully");
+        navigate('/signIn',{ replace : true });
+      }else{
+        toast.error(response?.message || "An Unexpected error occured");
+      }
+    } catch (error) {
+       console.error(error);
+       toast.error("An unexpected error occured");
+    }
   }
 
   return (
     <div className="bg-background-items relative flex min-h-screen w-full items-center justify-center px-4 py-10">
       <div className="w-full max-w-md rounded-2xl border border-border bg-surface p-8 shadow-sm sm:p-10">
         
-        {/* Icon */}
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-background-items">
           <HiOutlineLockClosed className="h-8 w-8 text-text-inverse" />
         </div>
 
-        {/* Heading */}
         <h1 className="mt-6 text-center text-2xl font-semibold text-text">
           Reset your password
         </h1>
 
-        {/* Body copy */}
         <p className="mt-3 text-center text-sm leading-relaxed text-text-secondary">
           Choose a new password for your account. Make it something you
           haven't used before.
         </p>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           
-          {/* New password */}
           <div>
             <label
               htmlFor="password"
@@ -82,7 +100,6 @@ const ResetPassword = () => {
             </p>
           </div>
 
-          {/* Confirm password */}
           <div>
             <label
               htmlFor="confirmPassword"
@@ -119,13 +136,12 @@ const ResetPassword = () => {
             )}
           </div>
 
-          {/* Submit */}
           <button
             type="submit"
-            disabled={!hasMinLength || !passwordsMatch}
+            disabled={!hasMinLength || !passwordsMatch || loading}
             className="mt-2 w-full rounded-xl bg-background-items px-4 py-3 text-sm font-medium text-text-inverse transition-colors hover:bg-background-itemsdark active:bg-background-itemsdark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:bg-text-disabled"
           >
-            Reset password
+            {loading ? 'Resetting password...' : 'Reset password'}
           </button>
         </form>
       </div>

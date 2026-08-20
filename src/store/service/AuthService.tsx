@@ -19,3 +19,12 @@ export const setAccessTokenApi = () => {
 export const logoutApi = () => {
     return axiosInstance.delete('/auth/logout');
 }
+export const forgotPasswordApi = (email : string) => {
+    return axiosInstance.patch("/auth/forgotPassword",{ email });
+}
+export const resetPasswordApi = (token : string, password : string) => {
+    return axiosInstance.patch(`auth/reset-password/${token}`,{ password });
+}
+export const resendEmailApi = ( email : string ) => {
+    return axiosInstance.post('/resend-verification', { email })
+}

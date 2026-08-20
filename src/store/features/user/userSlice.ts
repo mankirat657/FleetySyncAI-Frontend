@@ -47,7 +47,6 @@ const authSlice = createSlice({
         setError(state,action : PayloadAction<string>){
             state.loading = false;
             state.error = action.payload;
-            state.authChecked = false;
         }
     }
 })

@@ -3,25 +3,38 @@ import { HiOutlineEnvelopeOpen } from 'react-icons/hi2'
 import { IoClose } from 'react-icons/io5'
 import { FiArrowLeft, FiCheck } from 'react-icons/fi'
 import type { EmailSendProps } from '../types/interfaces'
+import { useDispatch, useSelector } from 'react-redux'
+import type { AppDispatch, RootState } from '../store/store'
+import { forgotPassword } from '../store/actions/auth.actions'
+import { toast } from 'react-toastify'
 
 const ForgotPassword = ({ setEmailShow }: EmailSendProps) => {
   const [email, setEmail] = useState('')
   const [sent, setSent] = useState(false)
-
+  const { loading } = useSelector((state : RootState) => state.auth);
   const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault()
-    if (!isValidEmail) return
-    // trigger reset email here
-    setSent(true)
+  const dispatch = useDispatch<AppDispatch>()
+  const handleSubmit = async(e : FormEvent) => {
+    e.preventDefault();
+    if (!isValidEmail) return;
+    try {
+      const response = await dispatch(forgotPassword(email));
+      if(response?.success){
+        toast.success(response?.success || "Password reset email link sent");
+        setSent(true);
+      }else{
+        toast.error(response?.message || "Unexpected error occured");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("An unexpected error occured try again later");
+    }
   }
 
   return (
     <div className="fixed inset-0 flex min-h-screen w-full items-center justify-center bg-black/20 px-4 py-10">
       <div className="relative w-full max-w-md rounded-2xl border border-border bg-surface p-8 shadow-sm sm:p-10">
         
-        {/* Close */}
         <div
           className="absolute top-3 right-3 cursor-pointer rounded-full p-2 transition-all ease-linear hover:bg-background-items hover:text-text-inverse"
           onClick={() => setEmailShow(false)}
@@ -29,14 +42,12 @@ const ForgotPassword = ({ setEmailShow }: EmailSendProps) => {
           <IoClose className="h-5 w-auto" />
         </div>
 
-        {/* Icon */}
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-background-items">
           <HiOutlineEnvelopeOpen className="h-8 w-8 text-text-inverse" />
         </div>
 
         {sent ? (
           <>
-            {/* Confirmation state */}
             <h1 className="mt-6 text-center text-2xl font-semibold text-text">
               Check your inbox
             </h1>
@@ -59,7 +70,6 @@ const ForgotPassword = ({ setEmailShow }: EmailSendProps) => {
           </>
         ) : (
           <>
-            {/* Request state */}
             <h1 className="mt-6 text-center text-2xl font-semibold text-text">
               Forgot your password?
             </h1>
@@ -78,12 +88,13 @@ const ForgotPassword = ({ setEmailShow }: EmailSendProps) => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
+                required
                 className="w-full rounded-xl border border-border bg-input px-4 py-2.5 text-sm text-text placeholder:text-input-placeholder transition-colors hover:border-border-hover focus:border-background-items focus:bg-background focus:outline-none focus-visible:ring-2 focus-visible:ring-background-input"
               />
 
               <button
                 type="submit"
-                disabled={!isValidEmail}
+                disabled={loading}
                 className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-background-items px-4 py-3 text-sm font-medium text-text-inverse transition-colors hover:bg-background-itemsdark active:bg-background-itemsdark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:bg-text-disabled"
               >
                 Send reset link
