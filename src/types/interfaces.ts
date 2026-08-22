@@ -4,8 +4,15 @@ export interface UserPreferences{
 }
 
 export interface OrganizationMembership{
-    organizationId : string;
-    role : "owner" | "admin" | "member"
+    id: null | undefined | string;
+    role? : "owner" | "admin" | "member";
+    description? : string;
+    memberAvatars : [];
+    name : string;
+    avatar : string;
+    membersCount : number;
+    lastLogin : number;
+
 }
 export interface User {
     id : string;

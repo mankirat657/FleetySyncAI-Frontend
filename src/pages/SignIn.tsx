@@ -14,9 +14,9 @@ import { FcGoogle } from 'react-icons/fc';
 import { Link, useNavigate } from 'react-router-dom';
 import ShowCase from '../components/ShowCase';
 import ForgotPassword from '../components/ForgotPassword';
-import { useDispatch, useSelector } from 'react-redux';
-import type { AppDispatch, RootState } from '../store/store';
-import { userLogin } from '../store/actions/auth.actions';
+import { useDispatch } from 'react-redux';
+import type { AppDispatch } from '../store/store';
+import { getMe, userLogin } from '../store/actions/auth.actions';
 import { toast } from 'react-toastify';
 
 const SignIn = () => {
@@ -36,7 +36,8 @@ const SignIn = () => {
       const response = await dispatch(userLogin(data));
       if (response?.success) {
         toast.success(response?.message || "Successfully logged In");
-        navigate("/",{ replace : true });
+        await dispatch(getMe())
+        navigate("/organization-setup",{ replace : true });
       } else {
         toast.error(response?.message || "Unexpected error occured");
       }
@@ -47,7 +48,8 @@ const SignIn = () => {
   };
 
   const handleGoogleSignup = () => {
-    console.log('Google sign-up clicked');
+     window.location.href = "http://localhost:3000/api/v1/auth/google";
+
   };
 
   const fieldClasses = (name: string, hasError: boolean, extraPadRight = false) => `

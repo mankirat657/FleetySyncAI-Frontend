@@ -23,8 +23,8 @@ export const forgotPasswordApi = (email : string) => {
     return axiosInstance.patch("/auth/forgotPassword",{ email });
 }
 export const resetPasswordApi = (token : string, password : string) => {
-    return axiosInstance.patch(`auth/reset-password/${token}`,{ password });
+    return axiosInstance.patch(`/auth/reset-password/${token}`,{ password });
 }
 export const resendEmailApi = ( email : string ) => {
-    return axiosInstance.post('/resend-verification', { email })
+    return axiosInstance.post('/auth/resend-verification', { email })
 }

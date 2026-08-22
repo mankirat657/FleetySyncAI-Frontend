@@ -23,7 +23,7 @@ const VerifyEmail = () => {
       if (res?.success) {
         toast.success(res?.message || "Email verified successfully! Redirecting...");
         await dispatch(getMe());
-        navigate("/");
+        navigate("/organization-setup");
       } else {
         toast.error(res?.message || "Verification failed.");
       }

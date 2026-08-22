@@ -7,7 +7,8 @@ const initialState : AuthState = {
     loading : false,
     error : null,
     isAuthenticated : false,
-    authChecked : false
+    authChecked : false,
+
 }
 const authSlice = createSlice({
     name : "auth",

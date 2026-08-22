@@ -51,7 +51,7 @@ const Signup = () => {
   };
 
   const handleGoogleSignup = () => {
-    console.log('Google sign-up clicked');
+    window.location.href = "http://localhost:3000/api/v1/auth/google";
   };
 
   const fieldClasses = (name: string, hasError: boolean, extraPadRight = false) => `

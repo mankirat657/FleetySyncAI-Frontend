@@ -10,6 +10,8 @@ import { useEffect } from "react"
 import { getMe } from "../store/actions/auth.actions"
 import { ProtectedRoute } from "../components/ProtectedRoute"
 import { PublicRoutes } from "../components/PublicRoutes"
+import OrganizationSetup from "../pages/OrganizationSetup"
+import Loader from "../components/Loader"
 
 const AppRoutes = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -21,9 +23,7 @@ const AppRoutes = () => {
 
   if (!authChecked) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background text-text">
-        <p className="text-sm font-medium">Loading session...</p>
-      </div>
+      <Loader />
     );
   }
 
@@ -31,6 +31,7 @@ const AppRoutes = () => {
     <Routes>
       <Route element={<ProtectedRoute />}>
         <Route path="/" element={<Home />} />
+        <Route path="/organization-setup" element={<OrganizationSetup />} />
       </Route>
 
       <Route element={<PublicRoutes />}>
