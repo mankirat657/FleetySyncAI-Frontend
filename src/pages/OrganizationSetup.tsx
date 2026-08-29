@@ -2,6 +2,7 @@ import { FiPlus, FiArrowRight, FiUsers, FiClock } from 'react-icons/fi'
 import { useSelector } from 'react-redux'
 import type { RootState } from '../store/store'
 import { Logo } from '../assets'
+import { Link } from 'react-router-dom'
 
 const OrganizationSetup = () => {
   const { user } = useSelector((state: RootState) => state.auth)
@@ -58,8 +59,8 @@ const OrganizationSetup = () => {
           </div>
         )}
 
-        <button
-          type="button"
+        <Link
+          to={"/organization-details"}
           className="group mt-6 flex w-full items-center gap-4 rounded-2xl border border-border bg-surface p-5 text-left shadow-sm transition-all hover:border-background-items hover:shadow-md active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus"
         >
           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-background-items transition-transform duration-200 group-hover:rotate-90">
@@ -74,7 +75,7 @@ const OrganizationSetup = () => {
             </p>
           </div>
           <FiArrowRight className="h-4 w-4 shrink-0 text-text-subtle transition-all group-hover:translate-x-0.5 group-hover:text-background-items" />
-        </button>
+        </Link>
 
         {/* Terms */}
         <p className="mt-4 text-center text-xs leading-relaxed text-text-subtle">
