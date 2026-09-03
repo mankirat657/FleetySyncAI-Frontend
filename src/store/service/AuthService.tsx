@@ -1,6 +1,6 @@
 import { axiosInstance } from "../../services/axios";
 import type { loginData, RegisterData } from "../../types/interfaces";
-
+/***** Authentication flows api's ********/
 export const registerApi = (data : RegisterData) =>{
     return axiosInstance.post("/auth/register",data);
 }
@@ -27,4 +27,15 @@ export const resetPasswordApi = (token : string, password : string) => {
 }
 export const resendEmailApi = ( email : string ) => {
     return axiosInstance.post('/auth/resend-verification', { email })
+}
+/************** Organizaiton Api's ******************/
+export const createOrganizationApis = (name : string, description : string, logo : File | null ) => {
+    const formData = new FormData();
+
+    formData.append("name",name);
+    formData.append("description",description);
+    if(logo){
+        formData.append("logo",logo);
+    }
+    return axiosInstance.post('/org/createOrganization', formData);
 }

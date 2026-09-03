@@ -1,3 +1,4 @@
+/********* User interfaces ************/
 export interface UserPreferences{
     theme : "light" | "dark";
     notification : Boolean;
@@ -41,4 +42,27 @@ export interface loginData{
 }
 export interface EmailSendProps {
   setEmailShow: React.Dispatch<React.SetStateAction<boolean>>;
+}
+/********** Organization Interfaces ****************/
+export interface Organization {
+    name: string;
+    description: string;
+    logo: string | null;
+    owner: string;
+    membersCount: number;
+    lastLogin: Date | null;
+}
+
+export interface CreateOrganizationData {
+    name: string;
+    description: string;
+    logo: File | null;
+    emails?: string[];
+}
+
+export interface OrgState {
+    organization: Organization | null;
+    loading: boolean;
+    error: string | null;
+    isOrgExist: boolean;
 }

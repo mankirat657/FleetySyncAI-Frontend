@@ -1,3 +1,4 @@
+
 export type Inputs = {
     avatar : string;
     username : string;
@@ -5,3 +6,24 @@ export type Inputs = {
     password : string;
     confirmPassword : string;
 }
+export type Props = {
+  setSteps: React.Dispatch<React.SetStateAction<number>>;
+  orgName: string;
+  setOrgName: React.Dispatch<React.SetStateAction<string>>;
+};
+export type Props2 = {
+  setSteps: React.Dispatch<React.SetStateAction<number>>;
+  name: string;
+  setName: React.Dispatch<React.SetStateAction<string>>;
+  fileInputRef: React.RefObject<HTMLInputElement | null>;
+  imagePreview: string | null;
+  setImagePreview: React.Dispatch<React.SetStateAction<string | null>>;
+  logo : File | null;
+  setLogo : React.Dispatch<React.SetStateAction<File | null>>;
+};
+export type Props3 = {
+  setSteps: React.Dispatch<React.SetStateAction<number>>;
+  emails: string[];
+  setEmails: React.Dispatch<React.SetStateAction<string[]>>;
+  onSubmit : () => void;
+};
