@@ -5,17 +5,31 @@ import { toast } from "react-toastify";
 import Navbar from "../components/Navbar";
 import { Logo } from "../assets";
 import Footer from '../components/Footer'
-import { MdWorkspaces } from "react-icons/md";
+import { MdOutlineAddCircle, MdWorkspaces } from "react-icons/md";
 import { GoArrowRight } from "react-icons/go";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
+import { getMeOrganization } from "../store/actions/organization.actions";
 
 const Home = () => {
-  const { user, loading } = useSelector((state: RootState) => state.auth);
+  const { user } = useSelector((state: RootState) => state.auth);
+  const { organization } = useSelector((state: RootState) => state.org);
   console.log(user);
   const launchRef = useRef<HTMLDivElement>(null);
   const textref = useRef<HTMLDivElement>(null);
   const dispatch = useDispatch<AppDispatch>();
+  /* get current users organizaiton api */
+  // useEffect(() => {
+  //   const getOrganization = async() => {
+  //     try {
+  //       await dispatch(getMeOrganization());
+
+  //     } catch (error) {
+  //       console.error(error);
+  //     }
+  //   }
+  //   getOrganization();
+  // },[dispatch]);
   const logout = async () => {
     try {
       const response = await dispatch(userLogout());
@@ -36,18 +50,18 @@ const Home = () => {
       <div className="relative h-[63vh] min-h-[420px] mt-[-5rem] flex items-center justify-center
                       rounded-b-[6rem] sm:rounded-b-[8rem] lg:rounded-b-[12rem]
                       bg-gradient-to-b from-[#1a1a1f] to-[#0b0b0d] border-b border-red-500/10">
-        
+
         <div className="absolute -top-40 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-gradient-to-r from-red-500/20 to-red-600/10 blur-[120px]" />
-        
+
         <div className="welcome text-center px-4 relative z-10">
           <div className="inline-flex items-center mt-8 gap-2 rounded-full border border-red-500/20 bg-red-500/10 px-4 py-2 backdrop-blur-sm mb-6">
             <span className="h-2 w-2 animate-pulse rounded-full bg-red-500" />
             <span className="text-sm font-medium text-red-400">Welcome back</span>
           </div>
-          
+
           <h1 className="text-4xl sm:text-5xl lg:text-6xl text-white font-bold">
             Welcome Back <span className="animate-wave">👋🏻</span>
-            <span className="block bg-gradient-to-r from-red-400 to-red-300 bg-clip-text text-transparent cursiveFont mt-2">
+            <span className="block bg-gradient-to-r italic from-red-400 to-red-300 bg-clip-text text-transparent cursiveFont mt-2">
               {user?.username}
             </span>
           </h1>
@@ -60,35 +74,42 @@ const Home = () => {
 
       <div className="relative z-10 w-[92%] sm:w-[88%] lg:w-[80%] mx-auto -mt-[12vh]">
         <div className="header flex items-center justify-between">
-          <div className="flex p-2 items-center gap-2">
+          <div className="flex p-2 pb-3 items-center gap-2">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-red-500 to-red-600 shadow-lg shadow-red-500/30">
               <MdWorkspaces className="w-6 h-auto text-white" />
             </div>
             <h1 className="text-white font-bold text-lg">My Workspaces</h1>
           </div>
         </div>
-        
+
         <div className="w-full min-h-fit bg-white/5 backdrop-blur-sm border border-white/10 shadow-xl rounded-2xl">
           <div className="border-b px-5 pt-2 border-white/10">
             <h1 className="border-b-3 py-2 border-red-500 w-fit text-white">WorkSpaces</h1>
           </div>
-          
+
           <div className="px-5 py-3">
-            <h3 className="text-md font-semibold text-white/60">Ready to launch</h3>
-            
-            {Array.isArray(user?.organization) && user?.organization.map((org) => {
+            <h3 className="text-md font-semibold pb-4 text-white/60">Ready to launch</h3>
+
+            {Array.isArray(user?.organization) && user.organization.length > 0 && user?.organization.map((org) => {
               return (
+                <Link to={'/workspace'} state={org}>
                 <div
-                  className="group mb-[9vh] border border-white/5 hover:border-red-500/30 flex hover:bg-red-500/5 rounded-3xl cursor-pointer items-center justify-between transition-all duration-300 hover:shadow-lg hover:shadow-red-500/5"
+                  className="group pl-2 mb-4 border border-white/5 hover:border-red-500/30 flex hover:bg-red-500/5 rounded-3xl cursor-pointer items-center justify-between transition-all duration-300 hover:shadow-lg hover:shadow-red-500/5"
                   key={org.id}
                 >
-                  <div className="flex pt-4 gap-2">
-                    <div className="w-20 h-20 overflow-hidden rounded-3xl border border-white/10">
-                      <img
-                        src={org.avatar}
-                        className="w-full h-full object-cover"
-                        alt=""
-                      />
+                  <div className="flex pt-2 pb-2 gap-2">
+                    <div className="w-20 flex items-center justify-center h-20 overflow-hidden rounded-3xl border border-white/10">
+                      {org.avatar ? (
+                        <img
+                          src={org.avatar}
+                          className="w-full h-full object-cover"
+                          alt={org.name}
+                        />
+                      ) : (
+                        <p className="text-white cursiveFont text-4xl font-bold">
+                          {org.name.charAt(0).toUpperCase()}
+                        </p>
+                      )}
                     </div>
 
                     <div className="flex flex-col">
@@ -117,13 +138,13 @@ const Home = () => {
                         ))}
 
                         <p className="text-sm text-white/50">
-                          <span className="font-bold cursiveFont text-white/70">
+                          <span className="bg-gradient-to-r from-red-400 to-red-300 bg-clip-text text-transparent cursiveFont font-semibold">
                             {org.membersCount} members
                           </span>
                         </p>
 
                         <p className="text-sm text-white/40">
-                          last login : {org.lastLogin}
+                          last login : {new Date(user.lastLogin).toLocaleString()}
                         </p>
                       </div>
                     </div>
@@ -142,9 +163,19 @@ const Home = () => {
                     />
                   </div>
                 </div>
+                </Link>
+
               )
             })}
-            
+            {Array.isArray(user?.organization) && user.organization.length === 0 && <div className="flex items-center justify-center pb-6">
+              <div className="relative cursor-pointer flex items-center flex-col gap-2">
+                <Link to={"/organization-setup"}>
+                  <MdOutlineAddCircle className="text-background relative z-50 hover:scale-105 transition-all ease-linear w-20 h-auto" />
+                </Link>
+                <h1 className="text-center  text-surface">Start by creating <span className="font-semibold italic cursiveFont bg-gradient-to-r bg-clip-text text-transparent from-red-400 to-red-300">workspaces</span></h1>
+                <div className="absolute alterativeSec top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 w-[5vw] h-[3vh] bg-surface blur-xl"></div>
+              </div>
+            </div>}
             <div className="py-3 border-t border-white/10 px-5">
               <div className="">
                 <Link to={"/organization-setup"}>
@@ -163,7 +194,7 @@ const Home = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="py-5 h-[20vh] flex items-center justify-center">
           <div className="text-center">
             <h1 className="text-center text-lg font-bold text-white">
@@ -171,14 +202,13 @@ const Home = () => {
             </h1>
             <p className="text-white/50">
               Find the help you need in our{' '}
-              <span className="text-red-400 hover:underline cursor-pointer transition-colors">
+              <span className="bg-gradient-to-r from-red-400 to-red-300 bg-clip-text text-transparent cursiveFont font-semibold underline cursor-pointer">
                 Help Centre.
               </span>
             </p>
           </div>
         </div>
       </div>
-      
       <Footer />
     </div>
   )

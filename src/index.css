@@ -12,9 +12,9 @@
   --color-primary-muted: #e0e7ff;
 
   /* Background */
---color-background-items: #ef4444;     
---color-background-itemsdark: #dc2626; 
---color-background-input : #ffc3c37f;
+  --color-background-items: #ef4444;
+  --color-background-itemsdark: #dc2626;
+  --color-background-input: #ffc3c37f;
   --color-background: #f8fafc;
   --color-background-secondary: #f1f5f9;
   --bg-black: #000000;
@@ -83,49 +83,114 @@
   /* Focus */
   --color-focus: #4f46e5;
 }
-.testing{
-  background-color: #ffc3c37f;
+
+.testing {
+  background-color: #e5464624;
 }
-body,html{
-      width: 100%;
-      height: 100%;
-      overflow-x: hidden;
+
+body,
+html {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  background-color: #070707;
 }
-.alterative{
-      font-family: "Montserrat Alternates", sans-serif;
+::-webkit-scrollbar{
+  width: 0.2rem;
+  background-color: var(--color-background-itemsdark);
 }
-.alterativeSec{
-      font-family: "Manrope", sans-serif;
+::-webkit-scrollbar-thumb{
+  background-color: var(--color-background-items);
 }
-.glass{
+.alterative {
+  font-family: "Montserrat Alternates", sans-serif;
+}
+
+.alterativeSec {
+  font-family: "Manrope", sans-serif;
+}
+
+.glass {
   background-color: #00000024;
   backdrop-filter: blur(10px);
 }
-.cursiveFont{
-    font-family: "Edu NSW ACT Cursive", cursive;
+
+.cursiveFont {
+  font-family: "Edu NSW ACT Cursive", cursive;
 }
+
 @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-10px); }
-        }
-        @keyframes floatSlow {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-6px); }
-        }
-        @keyframes drift {
-          0%, 100% { transform: translate(0, 0); }
-          50% { transform: translate(14px, -18px); }
-        }
-        @keyframes shine {
-          0% { transform: translateX(-120%) rotate(8deg); }
-          100% { transform: translateX(220%) rotate(8deg); }
-        }
-        .card-main { animation: float 6s ease-in-out infinite; }
-        .card-a { animation: floatSlow 5s ease-in-out infinite; animation-delay: 0.3s; }
-        .card-b { animation: floatSlow 5.5s ease-in-out infinite; animation-delay: 0.6s; }
-        .blob-1 { animation: drift 9s ease-in-out infinite; }
-        .blob-2 { animation: drift 11s ease-in-out infinite reverse; }
-        .shine-sweep { animation: shine 3.2s ease-in-out infinite; animation-delay: 1s; }
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes floatSlow {
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes drift {
+
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+
+  50% {
+    transform: translate(14px, -18px);
+  }
+}
+
+@keyframes shine {
+  0% {
+    transform: translateX(-120%) rotate(8deg);
+  }
+
+  100% {
+    transform: translateX(220%) rotate(8deg);
+  }
+}
+
+.card-main {
+  animation: float 6s ease-in-out infinite;
+}
+
+.card-a {
+  animation: floatSlow 5s ease-in-out infinite;
+  animation-delay: 0.3s;
+}
+
+.card-b {
+  animation: floatSlow 5.5s ease-in-out infinite;
+  animation-delay: 0.6s;
+}
+
+.blob-1 {
+  animation: drift 9s ease-in-out infinite;
+}
+
+.blob-2 {
+  animation: drift 11s ease-in-out infinite reverse;
+}
+
+.shine-sweep {
+  animation: shine 3.2s ease-in-out infinite;
+  animation-delay: 1s;
+}
 
 
 .loader {
@@ -139,7 +204,7 @@ body,html{
   content: '';
   width: 48px;
   height: 5px;
-  background: #f0808050;
+  background: rgba(0, 0, 0, 0.4); /* dark transparent shadow */
   position: absolute;
   top: 60px;
   left: 0;
@@ -185,7 +250,7 @@ body,html{
 @keyframes shadow324 {
 
   0%,
-    100% {
+  100% {
     transform: scale(1, 1);
   }
 
@@ -193,25 +258,32 @@ body,html{
     transform: scale(1.2, 1);
   }
 }
+
 @keyframes wave {
   0% {
     transform: rotate(0deg);
   }
+
   10% {
     transform: rotate(14deg);
   }
+
   20% {
     transform: rotate(-8deg);
   }
+
   30% {
     transform: rotate(14deg);
   }
+
   40% {
     transform: rotate(-4deg);
   }
+
   50% {
     transform: rotate(10deg);
   }
+
   60%,
   100% {
     transform: rotate(0deg);

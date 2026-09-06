@@ -24,6 +24,12 @@ const organizationSlice = createSlice({
             state.loading = false,
             state.error = null
         },
+        getOrganizationSuccess : (state,action:PayloadAction<Organization>) => {
+            state.organization = action.payload,
+            state.isOrgExist = true,
+            state.loading = false;
+            state.error = null;
+        },
         orgUpdateSuccess : (state,action : PayloadAction<Organization>) => {
             state.organization = action.payload,
             state.isOrgExist = true,
@@ -41,6 +47,6 @@ const organizationSlice = createSlice({
     }
 })
 
-export const { setLoading,clearError,orgCreateSuccess,orgUpdateSuccess,orgDeleteSuccess,setError } = organizationSlice.actions;
+export const { setLoading,clearError,orgCreateSuccess,orgUpdateSuccess,orgDeleteSuccess,setError,getOrganizationSuccess } = organizationSlice.actions;
 export default organizationSlice.reducer;
 

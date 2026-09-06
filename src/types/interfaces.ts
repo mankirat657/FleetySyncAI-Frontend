@@ -23,6 +23,7 @@ export interface User {
     organization : OrganizationMembership[];
     preferences : UserPreferences;
     isEmailVerified : boolean;
+    lastLogin : Date
 }
 export interface AuthState{
     user : User | null;
@@ -65,4 +66,20 @@ export interface OrgState {
     loading: boolean;
     error: string | null;
     isOrgExist: boolean;
+}
+/********** Invitations interfaces ****************/
+export interface Invitation {
+    organization : string | null;
+    invitedBy : string;
+    email : string;
+    role : string;
+    status : string;
+    token : string;
+    expiresAt : Date;
+}
+export interface InviteState{
+    invitation : Invitation | null;
+    loading : boolean;
+    error : string | null;
+    isAccepted : boolean;
 }

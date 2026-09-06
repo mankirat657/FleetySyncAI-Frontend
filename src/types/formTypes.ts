@@ -20,10 +20,6 @@ export type Props2 = {
   setImagePreview: React.Dispatch<React.SetStateAction<string | null>>;
   logo : File | null;
   setLogo : React.Dispatch<React.SetStateAction<File | null>>;
-};
-export type Props3 = {
-  setSteps: React.Dispatch<React.SetStateAction<number>>;
-  emails: string[];
-  setEmails: React.Dispatch<React.SetStateAction<string[]>>;
-  onSubmit : () => void;
+  handleSubmit : () => void;
+
 };

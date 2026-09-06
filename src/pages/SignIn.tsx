@@ -37,7 +37,7 @@ const SignIn = () => {
       if (response?.success) {
         toast.success(response?.message || "Successfully logged In");
         await dispatch(getMe())
-        navigate("/organization-setup",{ replace : true });
+        navigate("/",{ replace : true });
       } else {
         toast.error(response?.message || "Unexpected error occured");
       }

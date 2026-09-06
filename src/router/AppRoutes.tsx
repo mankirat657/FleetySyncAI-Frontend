@@ -13,6 +13,7 @@ import { PublicRoutes } from "../components/PublicRoutes"
 import OrganizationSetup from "../pages/OrganizationSetup"
 import Loader from "../components/Loader"
 import OrganizationDetails from "../pages/OrganizationDetails"
+import Workspace from "../pages/Workspace"
 
 const AppRoutes = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -34,6 +35,7 @@ const AppRoutes = () => {
         <Route path="/" element={<Home />} />
         <Route path="/organization-setup" element={<OrganizationSetup />} />
         <Route path="/organization-details" element={<OrganizationDetails />} />
+        <Route path="/workspace" element={<Workspace />} />
       </Route>
 
       <Route element={<PublicRoutes />}>

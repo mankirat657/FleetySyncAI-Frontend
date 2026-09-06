@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState, useRef } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import {
     FiCheckSquare,
     FiGitBranch,
@@ -11,32 +11,66 @@ import {
     FiBell,
     FiMenu,
     FiX,
+    FiUser,
+    FiLogOut,
+    FiSettings,
 } from "react-icons/fi";
 import { Logo } from "../assets";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import type { RootState } from "../store/store";
+import type { AppDispatch } from "../store/store";
+import { userLogout } from "../store/actions/auth.actions";
+import { toast } from "react-toastify";
 
 const featureItems = [
     {
         icon: FiCheckSquare,
-        title: "Task management",
+         title: (
+      <>
+        Task{" "}
+        <span className="bg-gradient-to-r from-red-400 to-red-300 bg-clip-text text-transparent cursiveFont">
+          management
+        </span>
+      </>
+    ),
         description: "Plan, assign, and track work in one place.",
         badge: "Popular"
     },
     {
         icon: FiGitBranch,
-        title: "Task breakdown",
+       title: (
+      <>
+        Task{" "}
+        <span className="bg-gradient-to-r from-red-400 to-red-300 bg-clip-text text-transparent cursiveFont">
+          breakdown
+        </span>
+      </>
+    ),
         description: "Split big goals into clear, actionable steps.",
     },
     {
         icon: FiMessageCircle,
-        title: "Communication",
+        title: (
+      <>
+        Coummu
+        <span className="bg-gradient-to-r from-red-400 to-red-300 bg-clip-text text-transparent cursiveFont">
+        nication
+        </span>
+      </>
+    ),
         description: "Keep every conversation tied to the work.",
         badge: "New"
     },
     {
         icon: FiUsers,
-        title: "Task allocation",
+        title: (
+      <>
+        Task{" "}
+        <span className="bg-gradient-to-r from-red-400 to-red-300 bg-clip-text text-transparent cursiveFont">
+          allocation
+        </span>
+      </>
+    ),
         description: "Balance workload across your team with ease.",
     },
 ];
@@ -45,8 +79,12 @@ const Navbar = () => {
     const [featuresOpen, setFeaturesOpen] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
-    const { user } = useSelector((state : RootState) => state.auth);
-    
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
+    const { user } = useSelector((state: RootState) => state.auth);
+    const dispatch = useDispatch<AppDispatch>();
+    const navigate = useNavigate();
+
     useEffect(() => {
         const handleScroll = () => {
             const scrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
@@ -60,6 +98,33 @@ const Navbar = () => {
             window.removeEventListener("scroll", handleScroll);
         };
     }, []);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setIsDropdownOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    const handleLogout = async () => {
+        try {
+            const response = await dispatch(userLogout());
+            if (response?.success) {
+                toast.success(response?.message || "User logout successfully");
+                setIsDropdownOpen(false);
+                navigate("/signin");
+            } else {
+                toast.error(response?.message || "Unexpected error occurred");
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error("Unexpected error occurred");
+        }
+    };
 
     return (
         <header
@@ -107,7 +172,7 @@ const Navbar = () => {
                                 <div className="grid grid-cols-2 gap-2 rounded-xl border border-white/10 bg-[#0f0f14] p-4 shadow-2xl shadow-red-500/5 backdrop-blur-xl">
                                     {featureItems.map(({ icon: Icon, title, description, badge }) => (
                                         <div
-                                            key={title}
+                                            key={description}
                                             className="group relative flex cursor-pointer flex-col border border-transparent gap-2 rounded-lg p-4 transition-all duration-200 hover:border-red-500/20 hover:bg-red-500/5"
                                         >
                                             {badge && (
@@ -168,9 +233,73 @@ const Navbar = () => {
                             CREATE A NEW WORKSPACE
                         </button>
                     </Link>
-                    
-                    <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-red-500/30 shadow-lg shadow-red-500/20">
-                        <img src={user?.avatar} className="w-full h-full object-cover" alt="" />
+
+                    {/* User Avatar with Dropdown */}
+                    <div className="relative" ref={dropdownRef}>
+                        <div 
+                            className="w-10 h-10 rounded-full relative border-2 border-red-500/30 shadow-lg shadow-red-500/20 cursor-pointer hover:border-red-500/50 transition-all duration-300 hover:scale-105"
+                            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                        >
+                            <img 
+                                src={user?.avatar || 'https://ui-avatars.com/api/?name=User&background=red&color=fff'} 
+                                className="w-full rounded-full h-full object-cover" 
+                                alt={user?.username || 'User'} 
+                            />
+                        </div>
+
+                        {/* Dropdown Menu */}
+                        {isDropdownOpen && (
+                            <div className="absolute right-0 mt-3 w-64 bg-[#0f0f14] border border-white/10 rounded-xl shadow-2xl shadow-red-500/5 backdrop-blur-xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                                {/* User Info */}
+                                <div className="px-4 py-3 border-b border-white/10">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-full border-2 border-red-500/30 overflow-hidden">
+                                            <img 
+                                                src={user?.avatar || 'https://ui-avatars.com/api/?name=User&background=red&color=fff'} 
+                                                className="w-full h-full object-cover" 
+                                                alt={user?.username || 'User'} 
+                                            />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-sm font-semibold text-white truncate">
+                                                {user?.username || 'User'}
+                                            </p>
+                                            <p className="text-xs text-white/40 truncate">
+                                                {user?.email || 'user@example.com'}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Menu Items */}
+                                <div className="py-1">
+                                    <Link
+                                        to="/profile"
+                                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-white/70 hover:text-white hover:bg-red-500/10 transition-colors duration-200"
+                                        onClick={() => setIsDropdownOpen(false)}
+                                    >
+                                        <FiUser className="w-4 h-4" />
+                                        Profile
+                                    </Link>
+                                    <Link
+                                        to="/settings"
+                                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-white/70 hover:text-white hover:bg-red-500/10 transition-colors duration-200"
+                                        onClick={() => setIsDropdownOpen(false)}
+                                    >
+                                        <FiSettings className="w-4 h-4" />
+                                        Settings
+                                    </Link>
+                                    <div className="border-t border-white/5 my-1" />
+                                    <button
+                                        onClick={handleLogout}
+                                        className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors duration-200"
+                                    >
+                                        <FiLogOut className="w-4 h-4" />
+                                        Logout
+                                    </button>
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     <button
@@ -188,22 +317,25 @@ const Navbar = () => {
                         <Link
                             to="/about"
                             className="block text-sm font-bold text-white/70 transition-colors hover:text-white hover:pl-2"
+                            onClick={() => setMobileMenuOpen(false)}
                         >
                             About
                         </Link>
                         <Link
                             to="/enterprise"
                             className="block text-sm font-bold text-white/70 transition-colors hover:text-white hover:pl-2"
+                            onClick={() => setMobileMenuOpen(false)}
                         >
                             Enterprise
                         </Link>
                         <Link
                             to="/pricing"
                             className="block text-sm font-bold text-white/70 transition-colors hover:text-white hover:pl-2"
+                            onClick={() => setMobileMenuOpen(false)}
                         >
                             Pricing
                         </Link>
-                        <Link to={"/organization-setup"}>
+                        <Link to={"/organization-setup"} onClick={() => setMobileMenuOpen(false)}>
                             <button className="w-full rounded-full bg-gradient-to-r from-red-500 to-red-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-red-500/30 transition-all duration-300 hover:scale-[.98] hover:shadow-red-500/50">
                                 CREATE A NEW WORKSPACE
                             </button>

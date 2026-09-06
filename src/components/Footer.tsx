@@ -42,7 +42,7 @@ const Footer: React.FC = () => {
 
               <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
                 Everything your team needs.
-                <span className="block text-white/40">
+                <span className="block bg-gradient-to-r from-red-400 to-red-300 bg-clip-text text-transparent cursiveFont">
                   All in one workspace.
                 </span>
               </h2>
@@ -79,7 +79,7 @@ const Footer: React.FC = () => {
               </div>
 
               <span className="text-xl font-bold tracking-tight">
-                OrgSync<span className="text-red-500">AI</span>
+                OrgSync<span className="bg-gradient-to-r from-red-400 to-red-300 bg-clip-text text-transparent cursiveFont font-semibold">AI</span>
               </span>
             </div>
 

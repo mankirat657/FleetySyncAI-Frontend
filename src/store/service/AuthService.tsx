@@ -35,7 +35,27 @@ export const createOrganizationApis = (name : string, description : string, logo
     formData.append("name",name);
     formData.append("description",description);
     if(logo){
-        formData.append("logo",logo);
+        formData.append("file",logo);
     }
     return axiosInstance.post('/org/createOrganization', formData);
+}
+export const updateOrganizationApis = (id : string,name : string, description : string, logo : File | null) => {
+    const formData = new FormData();
+
+    formData.append("name",name);
+    formData.append("description",description);
+    if(logo){
+        formData.append("file",logo);
+    }
+    return axiosInstance.patch(`/org/orgranizations/${id}`,formData)
+}
+export const getOrganizationsApi = () => {
+    return axiosInstance.get('/org/organizations/me');
+}
+export const getAOrganizationApi = (id : string) => {
+    return axiosInstance.get(`/organizations/${id}`);
+}
+/*********** Invitation's Api's*****************/
+export const createInvitationsApi = (emails : string[],id : string) =>{
+    return axiosInstance.post(`/invite/invitations/${id}/invite`, { emails });
 }

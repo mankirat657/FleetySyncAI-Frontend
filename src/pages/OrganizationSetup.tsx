@@ -8,7 +8,7 @@ const OrganizationSetup = () => {
   const { user } = useSelector((state: RootState) => state.auth)
   const organizations = Array.isArray(user?.organization) ? user.organization : []
   console.log(user);
-  
+
   const totalMembers = organizations.reduce(
     (sum: number, org: any) => sum + (org.membersCount ?? 0),
     0
@@ -16,14 +16,14 @@ const OrganizationSetup = () => {
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-gradient-to-b from-[#0b0b0d] via-[#0f0f14] to-[#0b0b0d] px-3 sm:px-4 py-8 sm:py-12">
-      
+
       {/* Decorative glows */}
       <div className="blur-[880rem] pointer-events-none w-[15vh] sm:w-[20vh] md:w-[25vh] h-[15vh] sm:h-[20vh] md:h-[25vh] bg-red-500/20 absolute"></div>
       <div className="blur-[880rem] pointer-events-none w-[15vh] sm:w-[20vh] md:w-[25vh] h-[15vh] sm:h-[20vh] md:h-[25vh] top-0 right-0 bg-red-500/20 absolute"></div>
       <div className="absolute -top-40 left-1/2 h-60 w-60 -translate-x-1/2 rounded-full bg-red-500/10 blur-[120px]" />
 
       <div className="relative mx-auto w-full max-w-xl px-2 sm:px-0">
-        
+
         <div className="mx-auto flex w-fit items-center gap-2 rounded-full border border-red-500/20 bg-red-500/10 px-3 py-1 shadow-sm backdrop-blur-sm">
           <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />
           <span className="text-xs font-medium text-red-400">
@@ -100,7 +100,7 @@ const OrganizationSetup = () => {
           </span>
           <div className="h-px flex-1 bg-gradient-to-r from-transparent via-red-500/20 to-transparent" />
         </div>
-
+       
         <div className="mt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0">
           <div className="flex items-center gap-2">
             <div className="w-5 h-5 flex items-center justify-center text-white rounded-full text-xs sm:text-sm bg-gradient-to-br from-red-500 to-red-600 shadow-lg shadow-red-500/30">
@@ -111,7 +111,9 @@ const OrganizationSetup = () => {
           <p className="text-xs text-white/40 truncate">{user?.email}</p>
         </div>
 
+
         {organizations.length > 0 ? (
+           <Link to={"/workspace"}>
           <div className="mt-3 divide-y divide-white/10 overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm shadow-lg shadow-red-500/5">
             {organizations.map((org: any) => (
               <button
@@ -123,7 +125,17 @@ const OrganizationSetup = () => {
 
                 <div className="relative shrink-0">
                   <div className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center overflow-hidden rounded-xl border border-white/10 text-sm font-semibold text-white">
-                    <img src={org?.avatar} className="h-full w-full object-cover" alt="" />
+                    {org.avatar ? (
+                        <img
+                          src={org.avatar}
+                          className="w-full h-full object-cover"
+                          alt={org.name}
+                        />
+                      ) : (
+                        <p className="text-white cursiveFont text-xl font-bold">
+                          {org.name.charAt(0).toUpperCase()}
+                        </p>
+                      )}
                   </div>
                   <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-[#0b0b0d] bg-green-500" />
                 </div>
@@ -139,6 +151,7 @@ const OrganizationSetup = () => {
                       </span>
                     )}
                   </div>
+                  
                   <div className="mt-1.5 flex flex-wrap items-center gap-2">
                     <div className="flex -space-x-1.5">
                       {org.memberAvatars?.slice(0, 4).map((avatarUrl: string, i: number) => (
@@ -162,7 +175,9 @@ const OrganizationSetup = () => {
                     <span className="text-xs text-white/20 hidden sm:inline">•</span>
                     <span className="flex items-center gap-1 text-xs text-white/40 hidden sm:flex">
                       <FiClock className="h-3 w-3" />
-                      {org.lastLogin}
+                      {user?.lastLogin
+                        ? new Date(user.lastLogin).toLocaleString()
+                        : "Never"}
                     </span>
                   </div>
                 </div>
@@ -174,6 +189,7 @@ const OrganizationSetup = () => {
               </button>
             ))}
           </div>
+          </Link>
         ) : (
           <div className="mt-3 flex flex-col items-center rounded-2xl border border-dashed border-white/10 bg-white/5 px-6 py-8 sm:py-12 text-center shadow-sm">
             <p className="text-sm font-semibold text-white">No organizations yet</p>

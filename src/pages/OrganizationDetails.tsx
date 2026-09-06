@@ -1,6 +1,13 @@
 import { useRef, useState } from "react"
-import type { Props, Props2, Props3 } from "../types/formTypes";
+import type { Props, Props2 } from "../types/formTypes";
 import type { CreateOrganizationData } from "../types/interfaces";
+import { useDispatch, useSelector } from "react-redux";
+import type { AppDispatch, RootState } from "../store/store";
+import { createOrganization } from "../store/actions/organization.actions";
+import { toast } from "react-toastify";
+import { getMe } from "../store/actions/auth.actions";
+import { useNavigate } from "react-router-dom";
+import Loader from "../components/Loader";
 
 const Step1 = ({ setSteps, orgName, setOrgName }: Props) => {
     const [maxLength] = useState<number>(50);
@@ -45,7 +52,7 @@ const Step1 = ({ setSteps, orgName, setOrgName }: Props) => {
     )
 }
 
-const Step2 = ({ setSteps, name, setName, fileInputRef, imagePreview, setImagePreview, logo, setLogo }: Props2) => {
+const Step2 = ({ setSteps, name, setName, fileInputRef, imagePreview, setImagePreview, logo, setLogo,handleSubmit }: Props2) => {
     const [maxLength] = useState<number>(500);
     const [inputClicked, setInputClicked] = useState<boolean>(false);
 
@@ -114,7 +121,6 @@ const Step2 = ({ setSteps, name, setName, fileInputRef, imagePreview, setImagePr
                         )}
                     </div>
 
-                    {/* Edit Pencil Badge Overlay */}
                     <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-gradient-to-br from-red-500 to-red-600 border-2 border-[#0b0b0d] flex items-center justify-center shadow-lg shadow-red-500/30 group-hover:scale-105 transition-transform">
                         <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -132,170 +138,18 @@ const Step2 = ({ setSteps, name, setName, fileInputRef, imagePreview, setImagePr
             </div>
             <div className="button pt-8">
                 <button
-                    onClick={() => setSteps(3)}
+                    onClick={handleSubmit}
                     disabled={name.length === 0}
-                    className="bg-gradient-to-r from-red-500 to-red-600 text-white px-9 rounded-lg py-2 border border-transparent disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer hover:from-red-400 hover:to-red-500 transition-all ease-linear shadow-lg shadow-red-500/30 hover:shadow-red-500/50"
-                >
-                    Next
-                </button>
-            </div>
-        </div>
-    )
-}
-
-const Step3 = ({ setSteps, emails, setEmails, onSubmit }: Props3) => {
-    const [tags, setTags] = useState<string>("");
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    function tagsGenerator(e: React.KeyboardEvent<HTMLInputElement>) {
-        if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-
-            const email = tags.trim();
-
-            if (!email) return;
-
-            if (emails.includes(email)) return;
-
-            setEmails(prev => [...prev, email]);
-            setTags("");
-        }
-    }
-    const removeEmail = (emailToRemove: string) => {
-        setEmails(prev => prev.filter(email => email !== emailToRemove));
-    }
-
-    return (
-        <div className="flex flex-col gap-5 mt-4">
-            <div className="heading py-3 flex flex-col gap-3">
-                <h1 className="alterativeSec font-black text-2xl sm:text-3xl text-white">
-                    Invite your <span className="bg-gradient-to-r from-red-400 to-red-300 bg-clip-text text-transparent underline cursiveFont">teammates</span>
-                </h1>
-                <p className="text-white/50 text-sm sm:text-md">Slack works better with more people. Add your core collaborators.</p>
-            </div>
-            <div className="flex flex-col gap-3">
-                <p className="text-sm font-semibold text-white">
-                    Add teammate by email
-                </p>
-
-                <div
-                    className="
-                        w-full sm:w-[72%]
-                        min-h-[120px]
-                        p-3
-                        border
-                        border-white/10
-                        rounded-lg
-                        bg-white/5
-                        focus-within:border-red-500/50
-                        focus-within:ring-2
-                        focus-within:ring-red-500/20
-                        transition-all
-                        cursor-text
-                    "
-                    onClick={(e) => {
-                        const input = e.currentTarget.querySelector(
-                            "input"
-                        ) as HTMLInputElement;
-
-                        input?.focus();
-                    }}
-                >
-                    <div className="flex flex-wrap gap-2">
-
-                        {emails.map((email) => (
-                            <div
-                                key={email}
-                                className={`${!emailRegex.test(email) ? "bg-red-500/10 border-red-500/30 text-red-400" : "bg-green-500/10 border-green-500/30 text-green-400"}
-                                    flex
-                                    items-center
-                                    gap-2
-                                    px-3
-                                    py-1.5
-                                    rounded-full
-                                    border
-                                    text-sm
-                                    shadow-sm
-                                    animate-in
-                                    fade-in
-                                    zoom-in-95
-                                `}
-                            >
-                                <span>{email}</span>
-
-                                <button
-                                    type="button"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        removeEmail(email);
-                                    }}
-                                    className={`
-                                        w-5
-                                        h-5
-                                        flex
-                                        items-center
-                                        justify-center
-                                        rounded-full
-                                        ${!emailRegex.test(email) ? "hover:bg-red-500 hover:text-white" : "hover:bg-green-500 hover:text-white"}
-                                        transition-all
-                                        cursor-pointer
-                                    `}
-                                >
-                                    ×
-                                </button>
-                            </div>
-                        ))}
-
-                        <input
-                            value={tags}
-                            onChange={(e) => setTags(e.target.value)}
-                            onKeyDown={tagsGenerator}
-                            type="text"
-                            placeholder={
-                                emails.length === 0
-                                    ? "Ex. ellis@gmail.com, maria@gmail.com"
-                                    : "Add another email..."
-                            }
-                            className="
-                                flex-1
-                                min-w-[180px]
-                                outline-none
-                                bg-transparent
-                                text-sm
-                                py-1
-                                text-white
-                                placeholder:text-white/30
-                            "
-                        />
-
-                    </div>
-                </div>
-            </div>
-            <div className="button pt-8 flex flex-wrap items-center gap-2">
-                <button
-                    onClick={onSubmit}
-                    disabled={false}
                     className="bg-gradient-to-r from-red-500 to-red-600 text-white px-9 rounded-lg py-2 border border-transparent disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer hover:from-red-400 hover:to-red-500 transition-all ease-linear shadow-lg shadow-red-500/30 hover:shadow-red-500/50"
                 >
                     Submit
                 </button>
-                <button
-                    onClick={() => setSteps(3)}
-                    className="px-3 hover:underline cursor-pointer text-white/50 hover:text-white rounded-lg py-1 transition-all ease-linear"
-                >
-                    Skip this step
-                </button>
-            </div>
-            <div className="absolute top-3 right-4 flex gap-4">
-                <button
-                    onClick={() => setSteps(2)}
-                    className="bg-white/5 text-white/70 px-6 rounded-lg py-1 border border-white/10 cursor-pointer hover:bg-white/10 hover:text-white transition-all"
-                >
-                    Back
-                </button>
             </div>
         </div>
     )
 }
+
+
 
 const OrganizationDetails = () => {
     const [steps, setSteps] = useState<number>(1);
@@ -305,10 +159,25 @@ const OrganizationDetails = () => {
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [logo, setLogo] = useState<File | null>(null);
     const [emails, setEmails] = useState<string[]>([]);
-
-    const handleSubmit = () => {
-        const organizationData: CreateOrganizationData = { name: orgName, description: name, logo };
+    const { loading } = useSelector((state:RootState) => state.org); 
+    const dispatch = useDispatch<AppDispatch>();
+    const navigate = useNavigate();
+    const handleSubmit = async() => {
+        const organizationData: CreateOrganizationData = { name: orgName, description: name, logo, emails };
         console.log(organizationData);
+        try {
+            const response = await dispatch(createOrganization(organizationData.name, organizationData.description,logo));
+            if(response?.success){
+                toast.success(response?.message || "Organization Successfully Created");
+                await dispatch(getMe());
+                navigate("/",{ replace : true });
+            }else{
+                toast.error(response?.message || "Unexpected error occured");
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error("Unexpected error occured")
+        }
     }
     return (
         <div className="relative min-h-screen w-full overflow-hidden bg-gradient-to-b from-[#0b0b0d] via-[#0f0f14] to-[#0b0b0d] px-3 sm:px-4 py-8 sm:py-12 flex items-center justify-center">
@@ -365,7 +234,7 @@ const OrganizationDetails = () => {
 
                 <div className="relative z-10 flex flex-col h-full max-w-full lg:max-w-[65%]">
                     <div className="flex items-center gap-2 mb-4">
-                        {[1, 2, 3].map((itm, idx) => {
+                        {[1, 2].map((itm, idx) => {
                             return (
                                 <div
                                     key={idx}
@@ -376,10 +245,10 @@ const OrganizationDetails = () => {
                         })}
                     </div>
                     {steps === 1 && <Step1 setSteps={setSteps} orgName={orgName} setOrgName={setOrgName} />}
-                    {steps === 2 && <Step2 setSteps={setSteps} imagePreview={imagePreview} setImagePreview={setImagePreview} fileInputRef={fileInputRef} name={name} setName={setName} logo={logo} setLogo={setLogo} />}
-                    {steps === 3 && <Step3 setSteps={setSteps} emails={emails} setEmails={setEmails} onSubmit={handleSubmit} />}
+                    {steps === 2 && <Step2 setSteps={setSteps} imagePreview={imagePreview} setImagePreview={setImagePreview} fileInputRef={fileInputRef} name={name} setName={setName} logo={logo} setLogo={setLogo} handleSubmit={handleSubmit} />}
                 </div>
                 <div className="w-[21vh] h-[15vh] bg-red-500/20 left-1/2 -translate-x-1/2 blur-[90px] rounded-full absolute"></div>
+                {loading && <Loader />}
             </div>
         </div>
     )
