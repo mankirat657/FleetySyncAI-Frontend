@@ -53,7 +53,10 @@ export const getOrganizationsApi = () => {
     return axiosInstance.get('/org/organizations/me');
 }
 export const getAOrganizationApi = (id : string) => {
-    return axiosInstance.get(`/organizations/${id}`);
+    return axiosInstance.get(`/org/organizations/${id}`);
+}
+export const deleteOrganizationApi = (id : string) => {
+    return axiosInstance.delete(`/org/organizations/${id}`)
 }
 /*********** Invitation's Api's*****************/
 export const createInvitationsApi = (emails : string[],id : string) =>{

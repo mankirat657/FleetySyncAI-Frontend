@@ -9,11 +9,9 @@ import {
 import { useDispatch, useSelector } from 'react-redux'
 import { type AppDispatch, type RootState } from '../store/store'
 import Loader from './Loader'
-import { updateOrganization } from '../store/actions/organization.actions'
+import { RemoveOrganization, updateOrganization } from '../store/actions/organization.actions'
 import { toast } from 'react-toastify'
-import { getMe } from '../store/actions/auth.actions'
 import { useNavigate } from 'react-router-dom'
-
 const palette = {
     overlay: 'rgba(0,0,0,0.6)',
     panel: '#0a0a0c',
@@ -58,7 +56,6 @@ const MAX_FILE_MB = 5
 const EditOrganizationModal = ({ id, onClose, onSave, name = '', description = '', logo, logoUrl }: EditOrg) => {
     const initialLogoFile = logo instanceof File ? logo : null
     const initialLogoUrl = logoUrl ?? (typeof logo === 'string' ? logo : null)
-
     const [visible, setVisible] = useState(false)
     const [orgName, setOrgName] = useState(name)
     const [orgDescription, setOrgDescription] = useState(description)
@@ -125,12 +122,30 @@ const EditOrganizationModal = ({ id, onClose, onSave, name = '', description = '
         setPreview(null)
         if (fileInputRef.current) fileInputRef.current.value = ''
     }
-
+    const { user } = useSelector((state : RootState) => state.auth);
+    const role = user?.organization.find((f) => f.id === id)?.role;
+    console.log(role);
+    
     const canSave = orgName.trim().length > 0 && !isSubmitting
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate()
+    const handleDelete = async() => {
+        if(role !== "owner") return toast.warning("U don't have any rights to take this action")
+        try {
+            const response = await dispatch(RemoveOrganization(id));
+            if(response?.success){
+                toast.success(response?.message || "Organization deleted successfully");
+                navigate('/',{ replace : true });
+            }else{
+                toast.error(response?.message || "Unexpected error occured");
+            }
+        } catch (error) {
+            toast.error("Unexpected error occured");
+        }
+    }
     const handleSave = async () => {
         if (!canSave) return
+        if(role !== "owner") return toast.warning("U don't have any rights to take this action");
         setIsSubmitting(true)
         console.log(orgName, orgDescription, logoFile)
         try {
@@ -141,7 +156,7 @@ const EditOrganizationModal = ({ id, onClose, onSave, name = '', description = '
 
             if (response?.success) {
                 toast.success(response?.message || "organization updated successfully");
-                navigate('/workspace',{replace : true})
+                   onClose();
             }
             else {
                 toast.error(response?.message || "Unexpected error occured");
@@ -310,15 +325,27 @@ const EditOrganizationModal = ({ id, onClose, onSave, name = '', description = '
                     )}
                 </div>
 
-                {/* Footer */}
                 <div
-                    className="flex items-center justify-end gap-2 px-5 py-4"
+                    className="flex items-center justify-between gap-2 px-5 py-4"
                     style={{ borderTop: `1px solid ${palette.border}`, background: palette.surfaceRaised }}
                 >
+                    <div className="w-full">
+                       <button
+                        onClick={handleDelete}
+                        disabled={!canSave}
+                        className="flex items-center bg-background-itemsdark text-surface hover:bg-background-items cursor-pointer gap-2 rounded-lg px-4 py-2 text-xs font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+
+                    >
+                        {loading && <FiLoader size={14} className="animate-spin" />}
+                        {loading ? 'Deleting....' : 'Delete Organization'}
+                    </button>
+                    </div>
+                    <div className="flex items-center gap-2 justify-end w-full">
+
                     <button
                         onClick={handleClose}
                         disabled={isSubmitting}
-                        className="rounded-lg px-4 py-2 text-sm font-medium transition-colors hover:bg-white/5 disabled:opacity-50"
+                        className="rounded-lg px-4 py-2 text-xs cursor-pointer font-medium transition-colors hover:bg-white/5 disabled:opacity-50"
                         style={{ color: palette.textSecondary }}
                     >
                         Cancel
@@ -326,12 +353,14 @@ const EditOrganizationModal = ({ id, onClose, onSave, name = '', description = '
                     <button
                         onClick={handleSave}
                         disabled={!canSave}
-                        className="flex items-center bg-background-itemsdark text-surface hover:bg-background-items cursor-pointer gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                        className="flex items-center bg-[#46e55624] text-[#46e556] hover:text-surface hover:bg-[#46e556] cursor-pointer gap-2 rounded-lg px-4 py-2 text-xs font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50"
 
                     >
                         {isSubmitting && <FiLoader size={14} className="animate-spin" />}
                         {isSubmitting ? 'Saving…' : 'Save changes'}
                     </button>
+                    </div>
+
                 </div>
             </div>
             {loading && <Loader />}

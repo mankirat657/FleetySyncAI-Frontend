@@ -28,14 +28,17 @@ import {
     FiArchive as Archive,
 } from 'react-icons/fi'
 import { PiSparkleFill as Sparkles } from 'react-icons/pi'
-import { useSelector } from 'react-redux'
-import type { RootState } from '../store/store'
+import { useDispatch, useSelector } from 'react-redux'
+import { type AppDispatch, type RootState } from '../store/store'
 import { GoProject } from 'react-icons/go'
 import { BiTask } from 'react-icons/bi'
 import { FaLink } from 'react-icons/fa'
 import { Link } from 'react-router-dom'
 import { CgAdd } from 'react-icons/cg'
 import EditOrganizationModal from './EditOrganizationModal'
+import { userLogout } from '../store/actions/auth.actions'
+import { toast } from 'react-toastify'
+import InviteMemberModa from './InviteMemberModa'
 
 const palette = {
     canvas: '#000000',
@@ -73,13 +76,18 @@ interface NavItem {
 }
 
 interface Org {
-    avatar: string
+    logo: string
     description: string
-    id: string
-    memberAvatars: string[]
+    _id: string
+    lastLogin : Date;
     membersCount: number
     name: string
-    role: string
+    owner: {
+        _id : string;
+        avatar : string;
+        email : string;
+        username: string;
+    }
 }
 
 interface User {
@@ -125,9 +133,12 @@ export default function Sidebar({
     const [createMenuOpen, setCreateMenuOpen] = useState<boolean>(false)
     const [editOrganizationModal, setEditOrganizationModal] = useState<boolean>(false);
     const [profileOpen, setProfileOpen] = useState<boolean>(false)
+    const [invitationModalOpen,setInvitationModalOpen] = useState<boolean>(false);
     const { user } = useSelector((state: RootState) => state.auth)
     const anyMenuOpen = workspaceOpen || settingsMenuOpen || createMenuOpen || profileOpen
     console.log(data)
+    const dispatch = useDispatch<AppDispatch>();
+
     const closeAllMenus = () => {
         setWorkspaceOpen(false)
         setSettingsMenuOpen(false)
@@ -139,7 +150,20 @@ export default function Sidebar({
         () => projects.filter((p) => p.name.toLowerCase().includes(query.toLowerCase())),
         [projects, query]
     )
-
+    const org = user?.organization.find(f => f.id === data._id)
+    const logout = async () => {
+        try {
+          const response = await dispatch(userLogout());
+          if (response?.success) {
+            toast.success(response?.message || "user logout successfully")
+          } else {
+            toast.error(response?.message || "Unexpected error occurred");
+          }
+        } catch (error) {
+          console.error(error);
+          toast.error("unexpected error occured");
+        }
+      }
     return (
         <div
             className="flex h-screen shrink-0 overflow-hidden font-sans"
@@ -173,9 +197,9 @@ export default function Sidebar({
                             aria-label="Organization"
                             aria-expanded={workspaceOpen}
                         >
-                            {data.avatar ? (
+                            {data.logo ? (
                                 <img
-                                    src={data.avatar}
+                                    src={data.logo}
                                     alt={data.name ?? "Organization"}
                                     className="h-full w-full rounded-2xl object-cover"
                                 />
@@ -198,7 +222,7 @@ export default function Sidebar({
                                                 {data.name}
                                             </p>
                                             <p className="text-xs capitalize" style={{ color: palette.textMuted }}>
-                                                {data.role} · {data.membersCount} members
+                                              {data.membersCount} members
                                             </p>
                                         </div>
                                     </div>
@@ -404,6 +428,9 @@ export default function Sidebar({
                                         <p className="truncate text-xs" style={{ color: palette.textMuted }}>
                                             {user?.email ?? 'Not signed in'}
                                         </p>
+                                        <p className='bg-[#e5464624] my-1 w-fit px-2 py-1 text-xs rounded-md font-semibold text-background-itemsdark'>
+                                            {org?.role}
+                                        </p>
                                     </div>
                                 </div>
 
@@ -415,7 +442,7 @@ export default function Sidebar({
 
                                 <div className="h-px" style={{ background: palette.border }} />
 
-                                <div className="py-1">
+                                <div className="py-1" onClick={logout}>
                                     <ProfileMenuItem icon={LogOut} label="Sign out" tone="danger" />
                                 </div>
                             </div>
@@ -528,6 +555,7 @@ export default function Sidebar({
                         OrgSyncAi works better with your whole team in it.
                     </p>
                     <button
+                        onClick={() => setInvitationModalOpen(true)}
                         className="flex w-full items-center justify-center gap-2 rounded-lg py-2 text-[12.5px] font-semibold transition-colors bg-background-itemsdark text-surface hover:bg-background-items cursor-pointer"
                     >
                         <CgAdd size={13} />
@@ -536,7 +564,8 @@ export default function Sidebar({
                 </div>
             </section>
 
-            {editOrganizationModal && <EditOrganizationModal id={data.id} name={data.name} logo={data.avatar} description={data.description} logoUrl={data.avatar} onClose={() => setEditOrganizationModal(false)} />}
+            {editOrganizationModal && <EditOrganizationModal  id={data._id} name={data.name} logo={data.logo} description={data.description} logoUrl={data.logo} onClose={() => setEditOrganizationModal(false)} />}
+            {invitationModalOpen && <InviteMemberModa id={data._id} onClose={() => setInvitationModalOpen(false)} />}
         </div>
     )
 }

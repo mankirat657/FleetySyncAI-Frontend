@@ -92,7 +92,7 @@ const Home = () => {
 
             {Array.isArray(user?.organization) && user.organization.length > 0 && user?.organization.map((org) => {
               return (
-                <Link to={'/workspace'} state={org}>
+                <Link to={`/workspace/${org.id}`}>
                 <div
                   className="group pl-2 mb-4 border border-white/5 hover:border-red-500/30 flex hover:bg-red-500/5 rounded-3xl cursor-pointer items-center justify-between transition-all duration-300 hover:shadow-lg hover:shadow-red-500/5"
                   key={org.id}

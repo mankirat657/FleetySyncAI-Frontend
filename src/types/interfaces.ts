@@ -46,12 +46,18 @@ export interface EmailSendProps {
 }
 /********** Organization Interfaces ****************/
 export interface Organization {
+    _id : string;
     name: string;
     description: string;
-    logo: string | null;
-    owner: string;
+    logo: string;
+    owner: {
+        _id : string;
+        avatar : string;
+        email : string;
+        username : string
+    };
     membersCount: number;
-    lastLogin: Date | null;
+    lastLogin: Date;
 }
 
 export interface CreateOrganizationData {

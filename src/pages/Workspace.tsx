@@ -1,36 +1,56 @@
-import { useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
+import { fetchOrganization } from "../store/actions/organization.actions";
+import { useDispatch, useSelector } from "react-redux";
+import type { AppDispatch, RootState } from "../store/store";
+import Loader from "../components/Loader";
+import DashBoard from "../components/DashBoard";
 
 const Workspace = () => {
-    const location = useLocation();
-    const org = location.state || {};
-    const [activeNav, setActiveNav] = useState("home");
-    useEffect(()=>{
+    const { id } = useParams<{ id: string }>();
 
-    },[])
+    const [activeNav, setActiveNav] = useState("home");
+
+    const dispatch = useDispatch<AppDispatch>();
+
+    const { organization, loading } = useSelector(
+        (state: RootState) => state.org
+    );
+    console.log(organization);
+
+    useEffect(() => {
+        if(!id) return;
+
+        const getOrganization = async () => {
+            await dispatch(fetchOrganization(id));
+        };
+
+        getOrganization();
+    }, [dispatch, id]);
+
+    if (loading || !organization) {
+        return (
+            <div className="flex h-screen w-screen items-center justify-center bg-[#0b0b0d]">
+                <Loader />
+            </div>
+        );
+    }
 
     return (
-        <div className="w-screen h-screen flex overflow-hidden bg-gradient-to-b from-[#0b0b0d] via-[#0f0f14] to-[#0b0b0d]">
+        <div className="flex h-screen w-screen overflow-hidden bg-gradient-to-b from-[#0b0b0d] via-[#0f0f14] to-[#0b0b0d]">
 
             <Sidebar
-                data={org}
+                data={organization}
                 activeNav={activeNav}
                 setActiveNav={setActiveNav}
             />
 
             <main className="min-w-0 flex-1 overflow-y-auto">
-                
-                {activeNav === "home" && (
-                    <div className="p-8">
-                        <h1 className="text-2xl font-bold text-white">
-                            Welcome to {org.name}
-                        </h1>
 
-                        <p className="mt-2 text-zinc-400">
-                            Organization overview
-                        </p>
-                    </div>
+                {activeNav === "home" && (
+                    <DashBoard name={organization.name} _id={organization._id} description={organization.description} membersCount={organization.membersCount} lastLogin={organization.lastLogin} owner={organization.owner} logo={organization.logo} />
+
                 )}
 
                 {activeNav === "projects" && (
