@@ -17,7 +17,6 @@ const OrganizationSetup = () => {
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-gradient-to-b from-[#0b0b0d] via-[#0f0f14] to-[#0b0b0d] px-3 sm:px-4 py-8 sm:py-12">
 
-      {/* Decorative glows */}
       <div className="blur-[880rem] pointer-events-none w-[15vh] sm:w-[20vh] md:w-[25vh] h-[15vh] sm:h-[20vh] md:h-[25vh] bg-red-500/20 absolute"></div>
       <div className="blur-[880rem] pointer-events-none w-[15vh] sm:w-[20vh] md:w-[25vh] h-[15vh] sm:h-[20vh] md:h-[25vh] top-0 right-0 bg-red-500/20 absolute"></div>
       <div className="absolute -top-40 left-1/2 h-60 w-60 -translate-x-1/2 rounded-full bg-red-500/10 blur-[120px]" />
@@ -80,7 +79,6 @@ const OrganizationSetup = () => {
           <FiArrowRight className="h-4 w-4 shrink-0 text-white/30 transition-all group-hover:translate-x-0.5 group-hover:text-red-400" />
         </Link>
 
-        {/* Terms */}
         <p className="mt-4 text-center text-xs leading-relaxed text-white/30">
           By continuing, you agree to our{' '}
           <a href="#" className="text-white/50 underline underline-offset-2 hover:text-red-400 transition-colors">
@@ -113,9 +111,10 @@ const OrganizationSetup = () => {
 
 
         {organizations.length > 0 ? (
-           <Link to={"/workspace"}>
+        
           <div className="mt-3 divide-y divide-white/10 overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm shadow-lg shadow-red-500/5">
             {organizations.map((org: any) => (
+              <Link to={`/workspace/${org.id}`}>
               <button
                 key={org?.id}
                 type="button"
@@ -187,9 +186,10 @@ const OrganizationSetup = () => {
                   <FiArrowRight className="h-4 w-4 text-white/30 transition-colors group-hover:text-white" />
                 </div>
               </button>
+              </Link>
+
             ))}
           </div>
-          </Link>
         ) : (
           <div className="mt-3 flex flex-col items-center rounded-2xl border border-dashed border-white/10 bg-white/5 px-6 py-8 sm:py-12 text-center shadow-sm">
             <p className="text-sm font-semibold text-white">No organizations yet</p>

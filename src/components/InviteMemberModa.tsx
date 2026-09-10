@@ -1,5 +1,10 @@
 import React, { useRef, useState } from 'react'
-import { FiX as X, FiUserPlus as UserPlus, FiLoader as Loader, FiMail as Mail } from 'react-icons/fi'
+import { FiX as X, FiUserPlus as UserPlus, FiLoader  , FiMail as Mail } from 'react-icons/fi'
+import { useDispatch, useSelector } from 'react-redux'
+import type { AppDispatch, RootState } from '../store/store'
+import Loader from './Loader'
+import { sendInvites } from '../store/actions/invitation.actions'
+import { toast } from 'react-toastify'
 
 const palette = {
     overlay: 'rgba(0,0,0,0.6)',
@@ -43,7 +48,7 @@ const InviteMemberModal = ({ id, onClose, onInvite }: Invite) => {
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const inputRef = useRef<HTMLInputElement>(null)
-
+    const { loading } = useSelector((state : RootState) => state.invite);
     const handleClose = () => {
         setVisible(false)
         setTimeout(onClose, 180)
@@ -91,7 +96,7 @@ const InviteMemberModal = ({ id, onClose, onInvite }: Invite) => {
     const validCount = chips.filter((c) => c.valid).length
     const invalidCount = chips.length - validCount
     const canSend = validCount > 0 && !isSubmitting
-
+    const dispatch = useDispatch<AppDispatch>();
     const handleSend = async () => {
         commitInput()
         if (invalidCount > 0) {
@@ -105,11 +110,18 @@ const InviteMemberModal = ({ id, onClose, onInvite }: Invite) => {
         setError(null)
         setIsSubmitting(true)
         try {
-            console.log(chips.filter((c) => c.valid).map((c) => c.value) ,role)
-              
-            handleClose()
+            const emails = chips.filter((c) => c.valid).map((c) => c.value);
+            const response = await dispatch(sendInvites(emails,id));
+            if(response?.success){
+                toast.success(response?.message || "invitation sended successfully");
+                handleClose();
+            }else{
+                toast.error(response?.message || "Unexpected error occured");
+                handleClose();
+                setIsSubmitting(false)
+            }
         } catch {
-            setError('Something went wrong sending invites. Please try again.')
+            toast.error('Something went wrong sending invites. Please try again.')
             setIsSubmitting(false)
         }
     }
@@ -131,7 +143,6 @@ const InviteMemberModal = ({ id, onClose, onInvite }: Invite) => {
                     transform: visible ? 'scale(1) translateY(0)' : 'scale(0.96) translateY(8px)',
                 }}
             >
-                {/* Header */}
                 <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: `1px solid ${palette.border}` }}>
                     <div>
                         <h2 className="text-[15px] font-semibold" style={{ color: palette.text }}>
@@ -246,11 +257,12 @@ const InviteMemberModal = ({ id, onClose, onInvite }: Invite) => {
                         className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50 bg-background-itemsdark text-surface hover:bg-background-items cursor-pointer"
                         
                     >
-                        {isSubmitting ? <Loader size={14} className="animate-spin" /> : <UserPlus size={14} />}
+                        {isSubmitting ? <FiLoader size={14} className="animate-spin" /> : <UserPlus size={14} />}
                         {isSubmitting ? 'Sending…' : `Send invite${validCount > 1 ? 's' : ''}`}
                     </button>
                 </div>
             </div>
+            {loading && <Loader />}
         </div>
     )
 }

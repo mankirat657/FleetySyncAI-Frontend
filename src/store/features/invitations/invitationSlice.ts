@@ -22,8 +22,13 @@ const invitationSlice = createSlice({
             state.loading = false;
             state.error = null;
         },
-        inviteAcceptSuccess : (state,action: PayloadAction<Invitation>) => {
+        viewInvitationSuccess : (state,action : PayloadAction<Invitation>) =>{ 
             state.invitation = action.payload;
+            state.loading = false;
+            state.error = null;
+        },
+        inviteAcceptSuccess : (state) => {
+            state.invitation = null;
             state.loading = false;
             state.error = null;
             state.isAccepted = true;
@@ -39,12 +44,12 @@ const invitationSlice = createSlice({
             state.error = null;
         },
         setError : (state,action : PayloadAction<string>) => {
-              state.loading = false;
+            state.loading = false;
             state.error = action.payload;
         }
 
     }
 
 })
-export const { setLoading,clearError,inviteCreateSuccess,inviteAcceptSuccess,inviteRejectSuccess,inviteDeleteSuccess,setError } = invitationSlice.actions;
+export const { setLoading,clearError,inviteCreateSuccess,inviteAcceptSuccess,inviteRejectSuccess,inviteDeleteSuccess,setError,viewInvitationSuccess } = invitationSlice.actions;
 export default invitationSlice.reducer;

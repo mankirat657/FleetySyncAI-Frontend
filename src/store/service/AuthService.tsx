@@ -62,3 +62,15 @@ export const deleteOrganizationApi = (id : string) => {
 export const createInvitationsApi = (emails : string[],id : string) =>{
     return axiosInstance.post(`/invite/invitations/${id}/invite`, { emails });
 }
+export const getInvitationDetailsApi = (token : string) => {
+    return axiosInstance.post(`/invite/invitations/${token}`);
+}
+export const viewInvitationApi = (id : string) => {
+    return axiosInstance.get(`/invite/organization/${id}/invitations`);
+}
+export const getMyInvitationsApi = () => {
+    return axiosInstance.get('/invite/invitations/me');
+}
+export const acceptInvitationApi = (id : string) => {
+    return axiosInstance.post(`/invite/invitations/${id}/accept`);
+}

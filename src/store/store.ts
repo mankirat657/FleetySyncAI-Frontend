@@ -1,10 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
 import authReducer from './features/user/userSlice'
-import orgReducer from './features/organization/organizationSlice'
+import orgReducer from './features/organization/organizationSlice';
+import invitationReducer from './features/invitations/invitationSlice'
 export const store = configureStore({
     reducer : {
         auth : authReducer,
-        org : orgReducer
+        org : orgReducer,
+        invite : invitationReducer
     }
 })
 

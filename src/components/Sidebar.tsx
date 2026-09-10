@@ -39,6 +39,7 @@ import EditOrganizationModal from './EditOrganizationModal'
 import { userLogout } from '../store/actions/auth.actions'
 import { toast } from 'react-toastify'
 import InviteMemberModa from './InviteMemberModa'
+import PendingInvitation from './PendingInvitation'
 
 const palette = {
     canvas: '#000000',
@@ -134,6 +135,7 @@ export default function Sidebar({
     const [editOrganizationModal, setEditOrganizationModal] = useState<boolean>(false);
     const [profileOpen, setProfileOpen] = useState<boolean>(false)
     const [invitationModalOpen,setInvitationModalOpen] = useState<boolean>(false);
+    const [pendingInvitationOpen,setPendingInvitationOpen] = useState<boolean>(false);
     const { user } = useSelector((state: RootState) => state.auth)
     const anyMenuOpen = workspaceOpen || settingsMenuOpen || createMenuOpen || profileOpen
     console.log(data)
@@ -332,7 +334,7 @@ export default function Sidebar({
                                     <div className="py-1">
                                         <SettingsMenuItem icon={UserCheck} label="Manage members" />
                                         <SettingsMenuItem icon={UserPlus} label="Manage roles" />
-                                        <SettingsMenuItem icon={FaLink} label="Pending invitations" />
+                                        <SettingsMenuItem icon={FaLink} handleClick={() => setPendingInvitationOpen(true)} label="Pending invitations" />
                                         <SettingsMenuItem icon={PieChart} label="Organization analytics" />
                                     </div>
                                 </div>
@@ -566,6 +568,7 @@ export default function Sidebar({
 
             {editOrganizationModal && <EditOrganizationModal  id={data._id} name={data.name} logo={data.logo} description={data.description} logoUrl={data.logo} onClose={() => setEditOrganizationModal(false)} />}
             {invitationModalOpen && <InviteMemberModa id={data._id} onClose={() => setInvitationModalOpen(false)} />}
+            {pendingInvitationOpen && <PendingInvitation id={data._id} onClose={() => setPendingInvitationOpen(false)} />}
         </div>
     )
 }
@@ -575,9 +578,10 @@ interface SettingsMenuItemProps {
     label: string
     badge?: string
     hasChevron?: boolean
+    handleClick?: () => void;
 }
 
-function SettingsMenuItem({ icon: Icon, label, badge, hasChevron }: SettingsMenuItemProps): React.ReactElement {
+function SettingsMenuItem({ icon: Icon, label, badge, hasChevron,handleClick }: SettingsMenuItemProps): React.ReactElement {
     const palette = {
         text: '#f4f4f5',
         textSecondary: '#c4c4c8',
@@ -588,7 +592,7 @@ function SettingsMenuItem({ icon: Icon, label, badge, hasChevron }: SettingsMenu
     }
 
     return (
-        <div className="flex cursor-pointer items-center justify-between px-3 py-2 transition-colors hover:bg-white/5">
+        <div onClick={handleClick} className="flex cursor-pointer items-center justify-between px-3 py-2 transition-colors hover:bg-white/5">
             <div className="flex items-center gap-3">
                 <Icon size={16} style={{ color: palette.textMuted }} />
                 <span className="text-sm font-medium" style={{ color: palette.textSecondary }}>{label}</span>

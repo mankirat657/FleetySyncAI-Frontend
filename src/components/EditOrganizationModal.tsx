@@ -12,6 +12,7 @@ import Loader from './Loader'
 import { RemoveOrganization, updateOrganization } from '../store/actions/organization.actions'
 import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
+import { getMe } from '../store/actions/auth.actions'
 const palette = {
     overlay: 'rgba(0,0,0,0.6)',
     panel: '#0a0a0c',
@@ -151,11 +152,10 @@ const EditOrganizationModal = ({ id, onClose, onSave, name = '', description = '
         try {
             const response = await dispatch(updateOrganization(id, orgName, orgDescription, logoFile));
 
-            console.log("UPDATE RESPONSE:", response);
-            console.log("UPDATED ORGANIZATION:", response?.organization);
 
             if (response?.success) {
                 toast.success(response?.message || "organization updated successfully");
+                await dispatch(getMe())
                    onClose();
             }
             else {
