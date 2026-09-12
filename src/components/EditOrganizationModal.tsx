@@ -189,7 +189,7 @@ const EditOrganizationModal = ({ id, onClose, onSave, name = '', description = '
                     style={{ borderBottom: `1px solid ${palette.border}` }}
                 >
                     <div>
-                        <h2 className="text-[15px] font-semibold" style={{ color: palette.text }}>
+                        <h2 className="text-sm bg-gradient-to-r from-red-400 to-red-300 bg-clip-text text-transparent cursiveFont font-semibold" >
                             Edit organization
                         </h2>
                         <p className="mt-0.5 text-xs" style={{ color: palette.textMuted }}>

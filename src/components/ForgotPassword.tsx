@@ -32,7 +32,7 @@ const ForgotPassword = ({ setEmailShow }: EmailSendProps) => {
   }
 
   return (
-    <div className="fixed inset-0 flex min-h-screen w-full items-center justify-center bg-black/20 px-4 py-10">
+    <div className="fixed inset-0 z-[2200] flex min-h-screen w-full items-center justify-center bg-black/20 px-4 py-10">
       <div className="relative w-full max-w-md rounded-2xl border border-border bg-surface p-8 shadow-sm sm:p-10">
         
         <div

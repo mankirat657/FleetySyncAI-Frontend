@@ -1,6 +1,6 @@
 import type { AppDispatch } from "../store";
 import { setLoading, clearError, setError, inviteCreateSuccess, viewInvitationSuccess, inviteAcceptSuccess, inviteRejectSuccess, inviteDeleteSuccess } from "../features/invitations/invitationSlice";
-import { acceptInvitationApi, createInvitationsApi, getMyInvitationsApi, viewInvitationApi } from "../service/AuthService";
+import { acceptInvitationApi, createInvitationsApi, deleteInvitationApi, getMyInvitationsApi, rejectInvitationApi, viewInvitationApi } from "../service/AuthService";
 
 
 export const sendInvites = (emails: string[], id: string) => async (dispatch: AppDispatch) => {
@@ -88,6 +88,49 @@ export const acceptInvitations = (token : string) => async(dispatch : AppDispatc
             message
         }
     }finally{
+        dispatch(setLoading(false));
+    }
+}
+export const rejectInvitations = (id : string) => async(dispatch : AppDispatch) => {
+    try {
+        dispatch(setLoading(true));
+        const response = await rejectInvitationApi(id);
+        if(response.data.success){
+            dispatch(inviteRejectSuccess());
+            return response.data;
+        }
+        dispatch(setError(response.data.message || "Unexpected error occured"));
+        return response.data;
+    } catch (error : any) {
+         const message = error.response?.data?.message || "Something went wrong"
+        dispatch(setError(message))
+        return {
+            success: false,
+            message
+        }
+    } finally{
+        dispatch(setLoading(false));
+    }
+}
+export const deleteInvitation = ( id : string ) => async(dispatch : AppDispatch) => {
+    try {
+        dispatch(setLoading(true));
+
+        const response = await deleteInvitationApi(id);
+        if(response.data.success){
+            dispatch(inviteDeleteSuccess());
+            return response.data;
+        }
+        dispatch(setError(response.data.message || "Unexpected error occured"));
+        return response.data;
+    } catch (error : any) {
+        const message = error.response?.data?.message || "Something went wrong"
+        dispatch(setError(message))
+        return {
+            success: false,
+            message
+        }
+    } finally{
         dispatch(setLoading(false));
     }
 }

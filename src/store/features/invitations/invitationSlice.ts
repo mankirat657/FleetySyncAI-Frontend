@@ -33,13 +33,12 @@ const invitationSlice = createSlice({
             state.error = null;
             state.isAccepted = true;
         },
-        inviteRejectSuccess : (state,action: PayloadAction<Invitation>) =>{
-            state.invitation = action.payload;
+        inviteRejectSuccess : (state) =>{
             state.loading = false;
             state.error = null;
             state.isAccepted = false;
         },
-        inviteDeleteSuccess : (state,action: PayloadAction<Invitation>) => {
+        inviteDeleteSuccess : (state) => {
             state.loading = false;
             state.error = null;
         },

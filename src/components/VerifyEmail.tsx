@@ -33,7 +33,7 @@ const VerifyEmail = () => {
     }
   };
   return (
-    <div className="bg-background-items relative flex min-h-screen w-full items-center justify-center px-4 py-10">
+    <div className="bg-background-items z-[2200] relative flex min-h-screen w-full items-center justify-center px-4 py-10">
       <div className="w-full max-w-md rounded-2xl border border-border bg-surface p-8 shadow-sm sm:p-10">
         
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-background-items">

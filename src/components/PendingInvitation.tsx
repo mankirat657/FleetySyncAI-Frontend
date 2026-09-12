@@ -5,12 +5,15 @@ import {
     FiClock as Clock,
     FiTrash2 as Trash2,
     FiRefreshCw as RefreshCw,
-    FiLoader as Loader,
+    FiLoader,
     FiInbox as Inbox,
 } from 'react-icons/fi'
-import { viewInvitations } from '../store/actions/invitation.actions'
+import { deleteInvitation, viewInvitations } from '../store/actions/invitation.actions'
 import { useDispatch, useSelector } from 'react-redux'
 import type { AppDispatch, RootState } from '../store/store'
+import Loader from './Loader'
+import { toast } from 'react-toastify'
+import { fetchOrganization } from '../store/actions/organization.actions'
 
 const palette = {
     overlay: 'rgba(0,0,0,0.6)',
@@ -40,10 +43,10 @@ interface Invitation {
     _id: string
     organization: string
     invitedBy: {
-        avatar : string;
-        email : string;
-        username : string;
-        _id : string
+        avatar: string;
+        email: string;
+        username: string;
+        _id: string
     }
     invitedByName?: string
     email: string
@@ -98,10 +101,9 @@ const PendingInvitation = ({ id, onClose, onDelete, onResend }: View) => {
     const [removedIds, setRemovedIds] = useState<string[]>([])
 
     const dispatch = useDispatch<AppDispatch>()
-    const { invitation } = useSelector((state: RootState) => state.invite)
+    const { invitation, loading } = useSelector((state: RootState) => state.invite)
     const invitations = (invitation ?? []) as Invitation[]
     console.log(invitations);
-    
     const handleClose = () => {
         setVisible(false)
         setTimeout(onClose, 180)
@@ -129,12 +131,21 @@ const PendingInvitation = ({ id, onClose, onDelete, onResend }: View) => {
         [invitations, removedIds]
     )
     console.log(sorted);
-    
+
     const handleDelete = async (invitationId: string) => {
         setPendingAction({ invitationId, type: 'delete' })
         try {
-            await onDelete?.(invitationId)
-            setRemovedIds((prev) => [...prev, invitationId])
+            const response = await dispatch(deleteInvitation(invitationId));
+            if (response?.success) {
+                toast.success(response?.message || "invitation successfully deleted");
+                await dispatch(fetchOrganization(invitationId));
+                return;
+            } else {
+                return toast.error(response?.message || "Unexpected error occured");
+            }
+        } catch (error) {
+            console.log(error);
+            return toast.error("Unexpected error occured")
         } finally {
             setPendingAction(null)
             setConfirmId(null)
@@ -171,7 +182,7 @@ const PendingInvitation = ({ id, onClose, onDelete, onResend }: View) => {
                 {/* Header */}
                 <div className="flex shrink-0 items-center justify-between px-5 py-4" style={{ borderBottom: `1px solid ${palette.border}` }}>
                     <div>
-                        <h2 className="text-[15px] font-semibold" style={{ color: palette.text }}>
+                        <h2 className="text-sm bg-gradient-to-r from-red-400 to-red-300 bg-clip-text text-transparent cursiveFont font-semibold">
                             Pending invitations
                         </h2>
                         <p className="mt-0.5 text-xs" style={{ color: palette.textMuted }}>
@@ -192,7 +203,7 @@ const PendingInvitation = ({ id, onClose, onDelete, onResend }: View) => {
                 <div className="min-h-0 flex-1 overflow-y-auto px-3 py-3">
                     {isFetching ? (
                         <div className="flex flex-col items-center gap-2 py-12" style={{ color: palette.textMuted }}>
-                            <Loader size={18} className="animate-spin" />
+                            <FiLoader size={18} className="animate-spin" />
                             <span className="text-xs">Loading invitations…</span>
                         </div>
                     ) : sorted.length === 0 ? (
@@ -225,7 +236,7 @@ const PendingInvitation = ({ id, onClose, onDelete, onResend }: View) => {
                                         <div className="min-w-0 flex-1">
                                             <div className="flex items-center gap-2">
                                                 <p className="truncate text-xs font-medium" style={{ color: palette.text }}>
-                                                   invited To :- {inv.email}
+                                                    invited To :- {inv.email}
                                                 </p>
                                                 <span
                                                     className="shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-semibold"
@@ -266,7 +277,7 @@ const PendingInvitation = ({ id, onClose, onDelete, onResend }: View) => {
                                                     aria-label="Resend invitation"
                                                     title="Resend invitation"
                                                 >
-                                                    {isResending ? <Loader size={13} className="animate-spin" /> : <RefreshCw size={13} />}
+                                                    {isResending ? <FiLoader size={13} className="animate-spin" /> : <RefreshCw size={13} />}
                                                 </button>
                                             )}
 
@@ -279,7 +290,7 @@ const PendingInvitation = ({ id, onClose, onDelete, onResend }: View) => {
                                                         className="flex h-7 items-center gap-1 rounded-lg px-2 text-[11px] font-semibold transition-colors disabled:opacity-50"
                                                         style={{ background: palette.danger, color: palette.textInverse }}
                                                     >
-                                                        {isDeleting ? <Loader size={12} className="animate-spin" /> : 'Confirm'}
+                                                        {isDeleting ? <FiLoader size={12} className="animate-spin" /> : 'Confirm'}
                                                     </button>
                                                     <button
                                                         type="button"
@@ -323,6 +334,7 @@ const PendingInvitation = ({ id, onClose, onDelete, onResend }: View) => {
                     </button>
                 </div>
             </div>
+            {loading && <Loader />}
         </div>
     )
 }

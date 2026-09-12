@@ -8,10 +8,10 @@ import Footer from '../components/Footer'
 import { MdOutlineAddCircle, MdWorkspaces } from "react-icons/md";
 import { GoArrowRight } from "react-icons/go";
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { getMeOrganization } from "../store/actions/organization.actions";
 import Loader from "../components/Loader";
-import { acceptInvitations, getInvitations } from "../store/actions/invitation.actions";
+import { acceptInvitations, getInvitations, rejectInvitations } from "../store/actions/invitation.actions";
 import { FiCheck, FiX } from "react-icons/fi";
 
 const Home = () => {
@@ -22,7 +22,7 @@ const Home = () => {
   const launchRef = useRef<HTMLDivElement>(null);
   const textref = useRef<HTMLDivElement>(null);
   const dispatch = useDispatch<AppDispatch>()
-  
+  const navigate = useNavigate();
   /* get current users organizaiton api */
   // useEffect(() => {
   //   const getOrganization = async() => {
@@ -53,6 +53,22 @@ const Home = () => {
       if(response?.success){
         toast.success(response?.message || "invitation accepted successfully");
         await dispatch(getMe());
+        await dispatch(getInvitations());
+      }else{
+        toast.error(response?.message || "Unexpected error occured");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Unexpected error occured");
+    }
+  }
+  const handleReject = async (id: string) => {
+    try {
+      const response = await dispatch(rejectInvitations(id));
+      if(response?.success){
+        toast.success(response?.message || "invitaiton accepted successfully");
+        await dispatch(getMe());
+        await dispatch(getInvitations());
       }else{
         toast.error(response?.message || "Unexpected error occured");
       }
@@ -247,7 +263,7 @@ const Home = () => {
                       <img src={inv.organization.logo} alt={inv.organization.name} className="w-full h-full object-cover" />
                     ) : (
                       <p className="text-white cursiveFont text-xl font-bold">
-                        {inv.organization.name.charAt(0).toUpperCase()}
+                        {Array.isArray(inv.organization) && inv.oragnization.length >0 &&  inv.organization.name.charAt(0).toUpperCase()}
                       </p>
                     )}
                   </div>
@@ -274,18 +290,18 @@ const Home = () => {
                   <div className="flex items-center gap-2 shrink-0">
                     <button
                       type="button"
-                      // onClick={() => handleReject(inv)}
-                      // disabled={isBusy}
-                      className="flex items-center gap-1.5 rounded-full border border-white/10 hover:border-white/20 hover:bg-white/5 px-3.5 py-1.5 text-xs font-medium text-white/60 transition-colors disabled:opacity-40"
+                       onClick={() => handleReject(inv._id)}
+                       disabled={loading}
+                      className="flex cursor-pointer items-center gap-1.5 rounded-full border border-white/10 hover:border-white/20 hover:bg-white/5 px-3.5 py-1.5 text-xs font-medium text-white/60 transition-colors disabled:opacity-40"
                     >
                       <FiX size={13} />
-                      {/* {isRejecting ? "Declining…" : "Decline"} */}
+                      {loading ? "Declining…" : "Decline"}
                     </button>
                     <button
                       type="button"
                       onClick={() => inviteAccept(inv._id)}
                        disabled={loading}
-                      className="flex items-center gap-1.5 rounded-full bg-gradient-to-r from-red-500 to-red-600 shadow-md shadow-red-500/20 px-3.5 py-1.5 text-xs font-semibold text-white transition-transform hover:scale-[1.03] disabled:opacity-50 disabled:hover:scale-100"
+                      className="flex cursor-pointer items-center gap-1.5 rounded-full bg-gradient-to-r from-red-500 to-red-600 shadow-md shadow-red-500/20 px-3.5 py-1.5 text-xs font-semibold text-white transition-transform hover:scale-[1.03] disabled:opacity-50 disabled:hover:scale-100"
                     >
                       <FiCheck size={13} />
                       {loading ? "Joining…" : "Accept"} 

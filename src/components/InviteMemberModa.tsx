@@ -145,7 +145,7 @@ const InviteMemberModal = ({ id, onClose, onInvite }: Invite) => {
             >
                 <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: `1px solid ${palette.border}` }}>
                     <div>
-                        <h2 className="text-[15px] font-semibold" style={{ color: palette.text }}>
+                        <h2 className="text-sm bg-gradient-to-r from-red-400 to-red-300 bg-clip-text text-transparent cursiveFont font-semibold">
                             Invite members
                         </h2>
                         <p className="mt-0.5 text-xs" style={{ color: palette.textMuted }}>

@@ -220,7 +220,7 @@ export default function Sidebar({
                                 <div className="px-3 py-2" style={{ borderColor: palette.border }}>
                                     <div className="flex items-center gap-3">
                                         <div className="min-w-0">
-                                            <p className="truncate text-sm font-semibold" style={{ color: palette.text }}>
+                                            <p className="truncate bg-gradient-to-r from-red-400 to-red-300 bg-clip-text text-transparent cursiveFont font-semibold text-sm" >
                                                 {data.name}
                                             </p>
                                             <p className="text-xs capitalize" style={{ color: palette.textMuted }}>
@@ -318,14 +318,14 @@ export default function Sidebar({
                             >
                                 <div className="max-h-[min(70vh,500px)] overflow-y-auto py-1">
                                     <div className="border-b px-4 py-3" style={{ borderColor: palette.border }}>
-                                        <p className="text-xs font-medium" style={{ color: palette.textMuted }}>Admin</p>
+                                        <p className="text-sm bg-gradient-to-r from-red-400 to-red-300 bg-clip-text text-transparent cursiveFont font-semibold">Admin</p>
                                     </div>
 
                                     <div className="py-1" onClick={() => setEditOrganizationModal(true)}>
                                         <SettingsMenuItem icon={Settings} label="Organization settings" />
                                         <div className="flex cursor-pointer items-center gap-3 py-1.5 pl-9 pr-3 transition-colors hover:bg-white/5" style={{ color: palette.textMuted }}>
                                             <Edit size={14} />
-                                            <span className="text-sm">Edit organization</span>
+                                            <span className="text-sm ">Edit organization</span>
                                         </div>
                                     </div>
 

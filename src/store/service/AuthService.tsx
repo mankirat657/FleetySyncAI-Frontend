@@ -74,3 +74,9 @@ export const getMyInvitationsApi = () => {
 export const acceptInvitationApi = (id : string) => {
     return axiosInstance.post(`/invite/invitations/${id}/accept`);
 }
+export const rejectInvitationApi = (id : string) =>{
+    return axiosInstance.post(`/invite/invitation/${id}/reject`)
+}
+export const deleteInvitationApi = (id : string) => {
+    return axiosInstance.delete(`/invite/organization/${id}/invitations`)
+}
