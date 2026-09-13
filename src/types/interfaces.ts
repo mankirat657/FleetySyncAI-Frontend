@@ -83,8 +83,20 @@ export interface Invitation {
     token : string;
     expiresAt : Date;
 }
+export interface Members {
+    _id: string;
+    username: string;
+    email: string;
+    avatar: string;
+    organization: {
+        _id: string;
+        organizationId: string;
+        role: "admin" | "member" | "owner";
+    };
+}
 export interface InviteState{
     invitation : Invitation | null;
+    members : Members | null;
     loading : boolean;
     error : string | null;
     isAccepted : boolean;

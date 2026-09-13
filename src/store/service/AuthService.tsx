@@ -80,3 +80,15 @@ export const rejectInvitationApi = (id : string) =>{
 export const deleteInvitationApi = (id : string) => {
     return axiosInstance.delete(`/invite/organization/${id}/invitations`)
 }
+export const getAllMembersApi = ( id : string ) => {
+    return axiosInstance.get(`/invite/organization/${id}/members`);
+}
+export const updateRoleApi = ( id : string, memId : string ,role : string) => {
+    return axiosInstance.patch(`/invite/organization/${id}/members/${memId}`, { role })
+}
+export const kickMemberApi = (id : string, memId : string) => {
+    return axiosInstance.delete(`/invite/orgainzation/${id}/members/${memId}`);
+}
+export const leaveOrganizationApi = (id : string ) => {
+    return axiosInstance.post(`/invite/organization/${id}/leave`);
+}

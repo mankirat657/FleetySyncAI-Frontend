@@ -134,7 +134,7 @@ const Navbar = () => {
                     : "bg-[#0f0f14] border-white/10"
             } border shadow-lg rounded-full`}
         >
-            <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
+            <nav className="flex h-16 items-center justify-between px-6">
                 <div className="flex items-center gap-10">
                     <Link to="/" className="flex items-center gap-1 group">
                         <div className="relative">

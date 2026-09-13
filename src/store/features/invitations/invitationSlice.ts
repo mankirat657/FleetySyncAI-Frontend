@@ -1,9 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-import type { Invitation,InviteState } from "../../../types/interfaces";
+import type { Invitation,InviteState, Members } from "../../../types/interfaces";
 
 const initialState : InviteState = {
     invitation : null,
+    members : null,
     loading : false,
     error : null,
     isAccepted : false
@@ -16,6 +17,7 @@ const invitationSlice = createSlice({
             state.loading = action.payload;
         },
         clearError : (state) => {
+            state.loading = false;
             state.error = null;
         },
         inviteCreateSuccess : (state) => {
@@ -42,6 +44,15 @@ const invitationSlice = createSlice({
             state.loading = false;
             state.error = null;
         },
+        getMembersSuccess : (state,action : PayloadAction<Members>) => {
+            state.members = action.payload;
+            state.loading = false;
+            state.error = null;
+        },
+        updateRoleSuccess : (state) => {
+            state.loading = false;
+            state.error = null;
+        },
         setError : (state,action : PayloadAction<string>) => {
             state.loading = false;
             state.error = action.payload;
@@ -50,5 +61,5 @@ const invitationSlice = createSlice({
     }
 
 })
-export const { setLoading,clearError,inviteCreateSuccess,inviteAcceptSuccess,inviteRejectSuccess,inviteDeleteSuccess,setError,viewInvitationSuccess } = invitationSlice.actions;
+export const { setLoading,clearError,getMembersSuccess,updateRoleSuccess,inviteCreateSuccess,inviteAcceptSuccess,inviteRejectSuccess,inviteDeleteSuccess,setError,viewInvitationSuccess } = invitationSlice.actions;
 export default invitationSlice.reducer;

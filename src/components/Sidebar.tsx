@@ -20,7 +20,7 @@ import {
     FiChevronRight as ChevronRight,
     FiUserCheck as UserCheck,
     FiLink,
-    FiPieChart as PieChart,
+    FiPieChart as PieChart, 
     FiEdit as Edit,
     FiUser as User,
     FiSliders as Sliders,
@@ -33,13 +33,16 @@ import { type AppDispatch, type RootState } from '../store/store'
 import { GoProject } from 'react-icons/go'
 import { BiTask } from 'react-icons/bi'
 import { FaLink } from 'react-icons/fa'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { CgAdd } from 'react-icons/cg'
 import EditOrganizationModal from './EditOrganizationModal'
-import { userLogout } from '../store/actions/auth.actions'
+import { getMe, userLogout } from '../store/actions/auth.actions'
 import { toast } from 'react-toastify'
 import InviteMemberModa from './InviteMemberModa'
 import PendingInvitation from './PendingInvitation'
+import DisplayMembers from './DisplayMembers'
+import { FcLeave } from 'react-icons/fc'
+import { leaveOrganization } from '../store/actions/invitation.actions'
 
 const palette = {
     canvas: '#000000',
@@ -62,7 +65,6 @@ const palette = {
     textInverse: '#ffffff',
 } as const
 
-// Mirrors project.model.ts — a project belongs to an organization and holds tasks.
 interface Project {
     id: string
     name: string
@@ -136,11 +138,12 @@ export default function Sidebar({
     const [profileOpen, setProfileOpen] = useState<boolean>(false)
     const [invitationModalOpen,setInvitationModalOpen] = useState<boolean>(false);
     const [pendingInvitationOpen,setPendingInvitationOpen] = useState<boolean>(false);
+    const [membersShowcase,setMembersShowcase] = useState<boolean>(false);
     const { user } = useSelector((state: RootState) => state.auth)
     const anyMenuOpen = workspaceOpen || settingsMenuOpen || createMenuOpen || profileOpen
     console.log(data)
     const dispatch = useDispatch<AppDispatch>();
-
+    const navigate = useNavigate();
     const closeAllMenus = () => {
         setWorkspaceOpen(false)
         setSettingsMenuOpen(false)
@@ -164,6 +167,21 @@ export default function Sidebar({
         } catch (error) {
           console.error(error);
           toast.error("unexpected error occured");
+        }
+      }
+      const organizationLeave = async() => {
+        try {
+            const response = await dispatch(leaveOrganization(data._id));
+            if(response?.success){
+                toast.success(response?.message || "successfully leaved organization");
+                await dispatch(getMe());
+                navigate('/',{ replace : true });
+            }else{
+                return toast.error(response?.message || "Unexpected error occured");
+            }
+        } catch (error) {
+            console.log(error);
+            return toast.error("Unexpected error occured");
         }
       }
     return (
@@ -294,7 +312,6 @@ export default function Sidebar({
                 </div>
 
                 <div className="flex w-full flex-col items-center gap-3">
-                    {/* Admin — mirrors organization.routes.ts + member.routes.ts */}
                     <div className="relative">
                         <button
                             className="relative flex h-9 w-9 items-center justify-center rounded-lg transition-colors hover:bg-white/5"
@@ -332,8 +349,7 @@ export default function Sidebar({
                                     <div className="h-px" style={{ background: palette.border }} />
 
                                     <div className="py-1">
-                                        <SettingsMenuItem icon={UserCheck} label="Manage members" />
-                                        <SettingsMenuItem icon={UserPlus} label="Manage roles" />
+                                        <SettingsMenuItem icon={UserCheck} handleClick={() => setMembersShowcase(true)} label="Manage members" />
                                         <SettingsMenuItem icon={FaLink} handleClick={() => setPendingInvitationOpen(true)} label="Pending invitations" />
                                         <SettingsMenuItem icon={PieChart} label="Organization analytics" />
                                     </div>
@@ -375,12 +391,12 @@ export default function Sidebar({
                                     <div className="my-1 h-px" style={{ background: palette.border }} />
 
                                     <CreateMenuItem icon={UserPlus} label="Invite member" description="Add someone to this organization" />
+                                   
                                 </div>
                             </div>
                         )}
                     </div>
 
-                    {/* Profile — mirrors auth.routes.ts getMe / logoutUser */}
                     <div className="relative">
                         <button
                             type="button"
@@ -558,17 +574,19 @@ export default function Sidebar({
                     </p>
                     <button
                         onClick={() => setInvitationModalOpen(true)}
-                        className="flex w-full items-center justify-center gap-2 rounded-lg py-2 text-[12.5px] font-semibold transition-colors bg-background-itemsdark text-surface hover:bg-background-items cursor-pointer"
+                        className="flex w-full items-center justify-center gap-2 rounded-lg py-2 text-[12.5px] font-semibold transition-colors bg-green-500 text-surface hover:bg-green-600 cursor-pointer"
                     >
                         <CgAdd size={13} />
                         Invite member
                     </button>
+                     {org?.role === "member" ? <button onClick={organizationLeave} className="flex mt-2 w-full items-center justify-center gap-2 rounded-lg py-2 text-[12.5px] font-semibold transition-colors bg-background-items text-surface hover:bg-background-itemsdark cursor-pointer"> <FcLeave size={13}/> Leave Organization</button> : ""}
                 </div>
             </section>
 
             {editOrganizationModal && <EditOrganizationModal  id={data._id} name={data.name} logo={data.logo} description={data.description} logoUrl={data.logo} onClose={() => setEditOrganizationModal(false)} />}
             {invitationModalOpen && <InviteMemberModa id={data._id} onClose={() => setInvitationModalOpen(false)} />}
             {pendingInvitationOpen && <PendingInvitation id={data._id} onClose={() => setPendingInvitationOpen(false)} />}
+            {membersShowcase && <DisplayMembers id={data._id} setMemberShowcase={setMembersShowcase} />}
         </div>
     )
 }
