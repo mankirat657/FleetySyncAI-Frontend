@@ -92,3 +92,15 @@ export const kickMemberApi = (id : string, memId : string) => {
 export const leaveOrganizationApi = (id : string ) => {
     return axiosInstance.post(`/invite/organization/${id}/leave`);
 }
+export const createProjectApi = (id : string, projectName : string, description : string,status : string) => {
+    return axiosInstance.post(`/project/organization/${id}/projects`,{projectName,description,status});
+}
+export const getProjectsApi = (id : string) => {
+    return axiosInstance.get(`/project/organization/${id}/projects`)
+}
+export const updateProjectApi = (projectId  : string,projectName : string, description : string, status : string) => {
+    return axiosInstance.patch(`/project/project/${projectId}`,{projectId,projectName,description});
+}
+export const deleteProjectApi = (projectId : string) => {
+    return axiosInstance.delete(`/project/project/${projectId}`);
+}

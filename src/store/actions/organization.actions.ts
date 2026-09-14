@@ -1,6 +1,5 @@
 import type { AppDispatch } from "../store";
 import { setLoading, setError, clearError, orgCreateSuccess, getOrganizationSuccess, orgUpdateSuccess, orgDeleteSuccess } from "../features/organization/organizationSlice";
-import type { CreateOrganizationData } from "../../types/interfaces";
 import { createOrganizationApis, deleteOrganizationApi, getAOrganizationApi, getOrganizationsApi, updateOrganizationApis } from "../service/AuthService";
 
 export const createOrganization = (name: string, description: string, logo: File | null) => async (dispatch: AppDispatch) => {

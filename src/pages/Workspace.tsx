@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../store/store";
 import Loader from "../components/Loader";
 import DashBoard from "../components/DashBoard";
+import Projects from "./Projects";
 
 const Workspace = () => {
     const { id } = useParams<{ id: string }>();
@@ -54,15 +55,7 @@ const Workspace = () => {
                 )}
 
                 {activeNav === "projects" && (
-                    <div className="p-8">
-                        <h1 className="text-2xl font-bold text-white">
-                            Projects
-                        </h1>
-
-                        <p className="mt-2 text-zinc-400">
-                            Manage your organization projects here.
-                        </p>
-                    </div>
+                    <Projects organization={organization} />
                 )}
 
                 {activeNav === "activity" && (

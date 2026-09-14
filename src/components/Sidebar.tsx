@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import type { IconType } from 'react-icons'
 import {
     FiHome as Home,
@@ -20,7 +20,7 @@ import {
     FiChevronRight as ChevronRight,
     FiUserCheck as UserCheck,
     FiLink,
-    FiPieChart as PieChart, 
+    FiPieChart as PieChart,
     FiEdit as Edit,
     FiUser as User,
     FiSliders as Sliders,
@@ -43,6 +43,9 @@ import PendingInvitation from './PendingInvitation'
 import DisplayMembers from './DisplayMembers'
 import { FcLeave } from 'react-icons/fc'
 import { leaveOrganization } from '../store/actions/invitation.actions'
+import { fetchProjects } from '../store/actions/project.actions'
+import Loader from './Loader'
+import type { Project } from '../types/interfaces'
 
 const palette = {
     canvas: '#000000',
@@ -65,12 +68,7 @@ const palette = {
     textInverse: '#ffffff',
 } as const
 
-interface Project {
-    id: string
-    name: string
-    openTasks: number
-    archived?: boolean
-}
+
 
 interface NavItem {
     id: string
@@ -82,13 +80,13 @@ interface Org {
     logo: string
     description: string
     _id: string
-    lastLogin : Date;
+    lastLogin: Date;
     membersCount: number
     name: string
     owner: {
-        _id : string;
-        avatar : string;
-        email : string;
+        _id: string;
+        avatar: string;
+        email: string;
         username: string;
     }
 }
@@ -114,19 +112,12 @@ const NAV_ITEMS: NavItem[] = [
     { id: 'tasks', label: 'My Tasks', icon: BiTask },
 ]
 
-const DEFAULT_PROJECTS: Project[] = [
-    { id: 'onboarding', name: 'Client onboarding', openTasks: 5 },
-    { id: 'mobile-app', name: 'Mobile app v2', openTasks: 12 },
-    { id: 'q3-roadmap', name: 'Q3 roadmap', openTasks: 0 },
-]
 
 export default function Sidebar({
     data,
-    projects = DEFAULT_PROJECTS,
     activeNav,
     setActiveNav,
 }: SidebarProps): React.ReactElement {
-    const [activeProject, setActiveProject] = useState<string>(projects[0]?.id ?? '')
     const [query, setQuery] = useState<string>('')
     const [mobileOpen, setMobileOpen] = useState<boolean>(false)
     const [bannerOpen, setBannerOpen] = useState<boolean>(true)
@@ -136,10 +127,14 @@ export default function Sidebar({
     const [createMenuOpen, setCreateMenuOpen] = useState<boolean>(false)
     const [editOrganizationModal, setEditOrganizationModal] = useState<boolean>(false);
     const [profileOpen, setProfileOpen] = useState<boolean>(false)
-    const [invitationModalOpen,setInvitationModalOpen] = useState<boolean>(false);
-    const [pendingInvitationOpen,setPendingInvitationOpen] = useState<boolean>(false);
-    const [membersShowcase,setMembersShowcase] = useState<boolean>(false);
+    const [invitationModalOpen, setInvitationModalOpen] = useState<boolean>(false);
+    const [pendingInvitationOpen, setPendingInvitationOpen] = useState<boolean>(false);
+    const [membersShowcase, setMembersShowcase] = useState<boolean>(false);
     const { user } = useSelector((state: RootState) => state.auth)
+    const { projects: rawProjects, loading } = useSelector((state: RootState) => state.project);
+    const project = useMemo(() => (Array.isArray(rawProjects) ? rawProjects : []), [rawProjects]);
+    const [activeProject, setActiveProject] = useState<string>(project[0]?._id ?? '')
+
     const anyMenuOpen = workspaceOpen || settingsMenuOpen || createMenuOpen || profileOpen
     console.log(data)
     const dispatch = useDispatch<AppDispatch>();
@@ -152,38 +147,55 @@ export default function Sidebar({
     }
 
     const filteredProjects = useMemo<Project[]>(
-        () => projects.filter((p) => p.name.toLowerCase().includes(query.toLowerCase())),
-        [projects, query]
+        () => project.filter((p) => p.projectName.toLowerCase().includes(query.toLowerCase()) && p.status !== "archived"),
+        [project, query]
+    )
+     const archivedProject = useMemo<Project[]>(
+        () => project.filter((p) => p.status === "archived"),
+        [project, query]
     )
     const org = user?.organization.find(f => f.id === data._id)
     const logout = async () => {
         try {
-          const response = await dispatch(userLogout());
-          if (response?.success) {
-            toast.success(response?.message || "user logout successfully")
-          } else {
-            toast.error(response?.message || "Unexpected error occurred");
-          }
+            const response = await dispatch(userLogout());
+            if (response?.success) {
+                toast.success(response?.message || "user logout successfully")
+            } else {
+                toast.error(response?.message || "Unexpected error occurred");
+            }
         } catch (error) {
-          console.error(error);
-          toast.error("unexpected error occured");
+            console.error(error);
+            toast.error("unexpected error occured");
         }
-      }
-      const organizationLeave = async() => {
+    }
+    const organizationLeave = async () => {
         try {
             const response = await dispatch(leaveOrganization(data._id));
-            if(response?.success){
+            if (response?.success) {
                 toast.success(response?.message || "successfully leaved organization");
                 await dispatch(getMe());
-                navigate('/',{ replace : true });
-            }else{
+                navigate('/', { replace: true });
+            } else {
                 return toast.error(response?.message || "Unexpected error occured");
             }
         } catch (error) {
             console.log(error);
             return toast.error("Unexpected error occured");
         }
-      }
+    }
+    useEffect(() => {
+        const getProjectDetails = async () => {
+            try {
+                const response = await dispatch(fetchProjects(data._id));
+                if (!response.sucess) {
+                    console.log(response?.message);
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        getProjectDetails();
+    }, [dispatch]);
     return (
         <div
             className="flex h-screen shrink-0 overflow-hidden font-sans"
@@ -242,7 +254,7 @@ export default function Sidebar({
                                                 {data.name}
                                             </p>
                                             <p className="text-xs capitalize" style={{ color: palette.textMuted }}>
-                                              {data.membersCount} members
+                                                {data.membersCount} members
                                             </p>
                                         </div>
                                     </div>
@@ -391,7 +403,7 @@ export default function Sidebar({
                                     <div className="my-1 h-px" style={{ background: palette.border }} />
 
                                     <CreateMenuItem icon={UserPlus} label="Invite member" description="Add someone to this organization" />
-                                   
+
                                 </div>
                             </div>
                         )}
@@ -536,24 +548,17 @@ export default function Sidebar({
                     <SectionLabel color={palette.textMuted}>Projects</SectionLabel>
                     <div className="flex flex-col gap-0.5">
                         {filteredProjects.map((p) => {
-                            const active = p.id === activeProject
+                            const active = p._id === activeProject
                             return (
                                 <button
-                                    key={p.id}
-                                    onClick={() => setActiveProject(p.id)}
+                                    key={p._id}
+                                    onClick={() => setActiveProject(p._id)}
                                     className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-left transition-colors"
                                     style={{ background: active ? "#e5464624" : 'transparent', color: active ? '#dc2626' : palette.textSecondary }}
                                 >
                                     <GoProject size={15} />
-                                    <span className={`flex-1 truncate text-[13.5px] ${p.openTasks ? 'font-semibold' : 'font-medium'}`}>{p.name}</span>
-                                    {p.openTasks > 0 && (
-                                        <span
-                                            className="flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-bold"
-                                            style={{ background: palette.danger, color: palette.textInverse }}
-                                        >
-                                            {p.openTasks}
-                                        </span>
-                                    )}
+                                    <span className={`flex-1 truncate text-[13.5px] font-semibold `}>{p.projectName}</span>
+                                   
                                 </button>
                             )
                         })}
@@ -561,10 +566,33 @@ export default function Sidebar({
                             <Plus size={15} />
                             <span className="text-[13.5px] font-medium">New project</span>
                         </button>
-                        <button className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-left transition-colors" style={{ color: palette.textFaint }}>
+                        <div className="">
+                        <div className="flex flex-col  gap-2 rounded-lg px-2.5 py-1.5 text-left transition-colors" style={{ color: palette.textFaint }}>
+                           <div className="flex items-center gap-1">
                             <Archive size={15} />
-                            <span className="text-[13.5px] font-medium">Archived tasks</span>
-                        </button>
+                            <span className="text-[13.5px] font-medium">Archived Project</span>
+                           </div>
+                            
+                            <div className="flex flex-col gap-2">
+                                {archivedProject.map((p) => {
+                                    const active = p._id === activeProject
+                                return (
+                                <button
+                                    key={p._id}
+                                    onClick={() => setActiveProject(p._id)}
+                                    className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-left transition-colors"
+                                    style={{ background: active ? "#e5464624" : 'transparent', color: active ? '#dc2626' : palette.textSecondary }}
+                                >
+                                    <GoProject size={15} />
+                                    <span className={`flex-1 truncate text-[13.5px] font-semibold `}>{p.projectName}</span>
+                                   
+                                </button>
+                            )
+                        })}
+                            </div>
+                        </div>
+
+                        </div>
                     </div>
                 </div>
 
@@ -579,14 +607,15 @@ export default function Sidebar({
                         <CgAdd size={13} />
                         Invite member
                     </button>
-                     {org?.role === "member" ? <button onClick={organizationLeave} className="flex mt-2 w-full items-center justify-center gap-2 rounded-lg py-2 text-[12.5px] font-semibold transition-colors bg-background-items text-surface hover:bg-background-itemsdark cursor-pointer"> <FcLeave size={13}/> Leave Organization</button> : ""}
+                    {org?.role === "member" ? <button onClick={organizationLeave} className="flex mt-2 w-full items-center justify-center gap-2 rounded-lg py-2 text-[12.5px] font-semibold transition-colors bg-background-items text-surface hover:bg-background-itemsdark cursor-pointer"> <FcLeave size={13} /> Leave Organization</button> : ""}
                 </div>
             </section>
 
-            {editOrganizationModal && <EditOrganizationModal  id={data._id} name={data.name} logo={data.logo} description={data.description} logoUrl={data.logo} onClose={() => setEditOrganizationModal(false)} />}
+            {editOrganizationModal && <EditOrganizationModal id={data._id} name={data.name} logo={data.logo} description={data.description} logoUrl={data.logo} onClose={() => setEditOrganizationModal(false)} />}
             {invitationModalOpen && <InviteMemberModa id={data._id} onClose={() => setInvitationModalOpen(false)} />}
             {pendingInvitationOpen && <PendingInvitation id={data._id} onClose={() => setPendingInvitationOpen(false)} />}
             {membersShowcase && <DisplayMembers id={data._id} setMemberShowcase={setMembersShowcase} />}
+            {loading && <Loader />}
         </div>
     )
 }
@@ -599,7 +628,7 @@ interface SettingsMenuItemProps {
     handleClick?: () => void;
 }
 
-function SettingsMenuItem({ icon: Icon, label, badge, hasChevron,handleClick }: SettingsMenuItemProps): React.ReactElement {
+function SettingsMenuItem({ icon: Icon, label, badge, hasChevron, handleClick }: SettingsMenuItemProps): React.ReactElement {
     const palette = {
         text: '#f4f4f5',
         textSecondary: '#c4c4c8',

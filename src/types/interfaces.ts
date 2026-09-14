@@ -101,3 +101,31 @@ export interface InviteState{
     error : string | null;
     isAccepted : boolean;
 }
+/*****Project interfaces*****/
+export interface ProjectMember {
+    username: string;
+    email: string;
+    avatar: string;
+}
+
+export interface ProjectUser {
+    username: string;
+    email: string;
+    avatar: string;
+}
+
+export interface Project {
+    _id: string;
+    projectName: string;
+    description: string;
+    organization: string;
+    members: ProjectMember[];
+    status: "active" | "completed" | "in-progress" | "archived";
+    createdBy: ProjectUser;
+}
+
+export interface ProjectState {
+    projects: Project[] | null;
+    loading: boolean;
+    error: string | null;
+}
