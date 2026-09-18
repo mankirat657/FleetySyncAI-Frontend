@@ -356,7 +356,7 @@ const Projects = ({ organization }: { organization: Organization }) => {
                     </div>
                 )}
             </div>
-
+          
             {showCreate && (
                 <Modal onClose={() => setShowCreate(false)}>
                     <ModalHeader icon={FiPlus} title="New project" subtitle="Set up a new project workspace" onClose={() => setShowCreate(false)} />
